@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 0 10px;
+  background-image: linear-gradient(to right, rgb(0, 51, 219), #010202);
+}
+::selection {
+  color: #fff;
+  background: #675AFE;
+}
+.wrapper {
+  width: 460px;
+  padding: 30px;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.05);
+}
+.wrapper header {
+  font-size: 28px;
+  font-weight: 500;
+  text-align: center;
+}
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.tabs button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #999;
+  border-radius: 5px;
+  background: none;
+  transition: background 0.3s;
+}
+.tabs button.active {
+  background: #0667d0;
+  color: #fff;
+}
+.wrapper form {
+  margin: 40px 0 20px 0;
+}
+form :where(input, select, button) {
+  width: 100%;
+  outline: none;
+  border-radius: 5px;
+  border: none;
+}
+form p {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+form input {
+  height: 50px;
+  font-size: 17px;
+  padding: 0 15px;
+  border: 1px solid #999;
+}
+form input:focus {
+  padding: 0 14px;
+  border: 2px solid #0083b0;
+}
+form .drop-list {
+  display: flex;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+.drop-list .select-box {
+  display: flex;
+  width: 130px;
+  height: 45px;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+  border: 1px solid #999;
+}
+.select-box img {
+  max-width: 21px;
+  margin-left: 10px;
+  
+  
+}
+.select-box select {
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding-left: 8px;
+}
+.drop-list .icon {
+  height: 50px;
+  display: flex;
+  margin-top: 25px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  
+}
+.icon i {
+  color: #000;
+  font-size: 25px;
+  
+}
+form button {
+  height: 52px;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 30px;
+  font-size: 17px;
+  background: #0667d0;
+  transition: background 0.3s ease;
+}
+form button:hover {
+  background: #01447b;
+}
+.exchange-rate {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+}
+.exchange-rate strong {
+  font-size: 22px;
+  color: #0667d0;
+}
