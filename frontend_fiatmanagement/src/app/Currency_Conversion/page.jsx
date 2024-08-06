@@ -7,6 +7,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { FaArrowLeft, FaEllipsisV } from 'react-icons/fa';
+import { FaChevronRight } from 'react-icons/fa';
 
 const CurrencyConverter = () => {
     const router = useRouter();
@@ -19,16 +20,17 @@ const CurrencyConverter = () => {
     const [result, setResult] = useState('');
     const [error, setError] = useState('');
     const [showBottomSheet, setShowBottomSheet] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
     const [network, setNetwork] = useState('OP Mainnet');
     const [buy, setBuy] = useState('ETH');
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [credit, setCredit] = useState('IMPS');
     const [provide, setProvide] = useState('Onramp Money');
-    const apiKey = '1kBQlsFCsldQKeOuJHp36pwAmkV8HpBV';
     const cryptoApiKey = 'd87e655eb0580e20c381f19ecd513660587ebed07d93f102ac46a3efe32596ca';
 
     useEffect(() => {
         if (selectedCurrency) {
-            setFromCurrency(selectedCurrency);
+            setToCurrency(selectedCurrency);
             setShowBottomSheet(true);
         }
     }, [selectedCurrency]);
@@ -45,32 +47,17 @@ const CurrencyConverter = () => {
         }
 
         try {
-            let conversionRate;
-            let cryptoValue;
-
             if (isFiatCurrency(toCurrency) && !isFiatCurrency(fromCurrency)) {
                 const response = await axios.get(
                     `https://min-api.cryptocompare.com/data/price?fsym=${fromCurrency}&tsyms=${toCurrency}&api_key=${cryptoApiKey}`
                 );
-                conversionRate = response.data[toCurrency];
-                cryptoValue = parseFloat(amount) / conversionRate;
-            } else if (!isFiatCurrency(toCurrency) && isFiatCurrency(fromCurrency)) {
-                const response = await axios.get(
-                    `https://api.exchangerate-api.com/v4/latest/${toCurrency}`
-                );
-                conversionRate = response.data.rates[fromCurrency];
-                cryptoValue = parseFloat(amount) * conversionRate;
-            } else {
-                setError('Invalid currency selection');
-                setResult('');
-                return;
-            }
+                const conversionRate = response.data[toCurrency];
+                const cryptoValue = parseFloat(amount) / conversionRate;
 
-            if (conversionRate) {
                 setResult(cryptoValue.toFixed(2));
                 setError('');
             } else {
-                setError('Error fetching conversion rate');
+                setError('Invalid currency selection or unsupported conversion');
                 setResult('');
             }
         } catch (err) {
@@ -80,9 +67,7 @@ const CurrencyConverter = () => {
     };
 
     useEffect(() => {
-        if (toCurrency === 'INR') {
-            fetchConversionRates();
-        }
+        fetchConversionRates();
     }, [amount, fromCurrency, toCurrency]);
 
     const handleContinue = () => {
@@ -93,8 +78,8 @@ const CurrencyConverter = () => {
         setShowBottomSheet(!showBottomSheet);
     };
 
-    const handleNetworkClick = () => {
-        setShowBottomSheet(true);
+    const toggleDropdown = () => {
+        setShowDropdown(!showDropdown);
     };
 
     const handleKeypadClick = (key) => {
@@ -117,21 +102,13 @@ const CurrencyConverter = () => {
         });
     };
 
-    const handleNetworkChange = (network) => {
-        setNetwork(network);
-    };
-
-    const handleBuyChange = (buy) => {
-        setBuy(buy);
-    };
-
-    const handleCreditChange = (credit) => {
-        setCredit(credit);
-    };
-
-    const handleProvideChange = (provide) => {
-        setProvide(provide);
-    };
+    useEffect(() => {
+        const storedPaymentOption = localStorage.getItem('selectedPaymentOption');
+        if (storedPaymentOption) {
+            setCredit(storedPaymentOption);
+            setShowBottomSheet(false);
+        }
+    }, []);
 
     const handleCurrencyChange = (currency) => {
         setToCurrency(currency);
@@ -148,29 +125,39 @@ const CurrencyConverter = () => {
         setAmount(value);
     };
 
+    const togglePaymentOptions = () => {
+        setShowPaymentOptions(!showPaymentOptions);
+    };
+
+    const navigateToPaymentOptions = () => {
+        router.push('/PaymentOptions');
+        
+    };
+
     const navigateToCurrencySelector = () => {
         router.push('/CurrencyDropdown');
+        
     };
 
     return (
         <div className="converterContainer">
-        <div className="topBar">
-            <button className="topBarButton">
-                <FaArrowLeft className="topBarIcon" />
-            </button>
-            <div className="topBarTitle">Buy</div>
-            <button className="topBarButton" onClick={toggleBottomSheet}>
-                <FaEllipsisV className="topBarIcon" />
-            </button>
-        </div>
+            <div className="topBar">
+                <button className="topBarButton">
+                    <FaArrowLeft className="topBarIcon" />
+                </button>
+                <div className="topBarTitle">Buy</div>
+                <button className="topBarButton" onClick={toggleBottomSheet}>
+                    <FaEllipsisV className="topBarIcon" />
+                </button>
+            </div>
 
-            <div className="amountDisplay">
+            <div className="amountDisplay large">
                 <input
                     type="text"
                     value={amount === '' ? '0' : amount}
                     onChange={handleAmountChange}
                     className="amountInput"
-                    placeholder="Enter amount in INR"
+                    placeholder="{Enter amount in ${toCurrency}}"
                 />
                 <div className="amountContainer">
                     <span className="amountLabel">{toCurrency}</span>
@@ -187,27 +174,40 @@ const CurrencyConverter = () => {
                     <span className="amountLabel">{fromCurrency}</span>
                 </div>
             </div>
+            
             <div className="resultDisplay">
                 {error && <div className="error">{error}</div>}
             </div>
-            <hr />
-            <div className="paymentInfo" onClick={handleNetworkClick}>
+
+            <div className="paymentInfo" onClick={toggleDropdown}>
+                <hr />
                 <div className="networkInfo">
                     <img src="/images/network.jpeg" alt="Network" className="icon" />
                     <span className="smallText">Network:</span>
                     <div className="select-box">
                         <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
-                            {Object.keys(country_list).map((currencyCode) => (
-                                <option key={currencyCode} value={currencyCode}>
-                                    {currencyCode}
-                                </option>
-                            ))}
+                            {/* Add your options here */}
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="USDT">Tether (USDT)</option>
+                            <option value="BNB">Binance Coin (BNB)</option>
+                            <option value="USDC">USD Coin (USDC)</option>
+                            <option value="XRP">XRP (XRP)</option>
+                            <option value="BUSD">Binance USD (BUSD)</option>
+                            <option value="ADA">Cardano (ADA)</option>
+                            <option value="DOGE">Dogecoin (DOGE)</option>
+                            <option value="MATIC">Polygon (MATIC)</option>
+                            <option value="SOL">Solana (SOL)</option>
+                            <option value="DOT">Polkadot (DOT)</option>
+                            <option value="SHIB">Shiba Inu (SHIB)</option>
+                            <option value="LTC">Litecoin (LTC)</option>
+                            <option value="TRX">Tron (TRX)</option>
+                            <option value="AVAX">Avalanche (AVAX)</option>
                         </select>
                     </div>
                 </div>
-
                 <div className="paymentDetails">
-                    <div className="paymentRow">
+                    <div className="paymentRow" onClick={toggleDropdown}>
                         <img src="/images/buy.jpeg" alt="Buy" className="icon" />
                         <div className="paymentTextContainer">
                             <div className="buyContainer">
@@ -218,29 +218,24 @@ const CurrencyConverter = () => {
                         </div>
                     </div>
                 </div>
-
-                <div className="paymentDetails">
-    <div className="paymentRow">
-        <img src="/images/paywith.png" alt="Pay with" className="icon" />
-        <div className="textContainer">
-            <span>Pay with</span>
-            <div>{credit}</div>
-        </div>
-    </div>
-
-    <div className="paymentRow">
-        <div className="textContainer">
-            <span>Using</span>
-            <div className="usingContainer">
-                <div>{provide}</div>
-                
+                <div className="paymentDetails" onClick={navigateToPaymentOptions}>
+                    <div className="paymentRow">
+                        <img src="/images/paywith.png" alt="Pay with" className="icon" />
+                        <div className="textContainer">
+                            <span>Pay with</span>
+                            <FaChevronRight className="buyIcon2" />
+                            <div>{credit}</div>
+                        </div>
+                    </div>
+                    <div className="paymentRow">
+                        <div className="textContainer">
+                            <div className="usingContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
             </div>
-        </div>
-    </div>
-</div>
 
-            </div>
-            <hr />
             <div className="keypad">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '←'].map((key) => (
                     <button
@@ -256,28 +251,22 @@ const CurrencyConverter = () => {
             <button className="continueButton" onClick={handleContinue}>
                 Continue
             </button>
-            
-        {showBottomSheet && (
-            <div className="bottomSheet">
-                <div className="bottomSheetHeader">Change Currency</div>
-                <div className="bottomSheetContent">
-                    <div className="bottomSheetRow" onClick={navigateToCurrencySelector}>
-                        <span>{toCurrency}</span>
-                        <span>{fromCurrency}</span>
-                        
-                        <i className="fas fa-check"></i>
+
+            {showBottomSheet && (
+                <div className="bottomSheet">
+                    <div className="bottomSheetHeader1">
+                        <i className="fas fa-database"></i>
+                        <div className="bottomSheetHeader">Change Currency</div>
                     </div>
-                    {/* <div className="bottomSheetRow" onClick={() => handleCurrencyChange('INR')}>
-                        <span>INR</span>
-                        <i className="fas fa-check"></i>
-                    </div> */}
+                    <div className="bottomSheetContent">
+                        <div className="bottomSheetRow" onClick={navigateToCurrencySelector}>
+                            <span>{toCurrency}</span>
+                            <i className="fas fa-check"></i>
+                        </div>
+                    </div>
                 </div>
-                <div className="bottomSheetFooter">
-                    The conversion rates are indicative and may vary slightly.
-                </div>
-            </div>
-        )}
-    </div>
+            )}
+        </div>
     );
 };
 

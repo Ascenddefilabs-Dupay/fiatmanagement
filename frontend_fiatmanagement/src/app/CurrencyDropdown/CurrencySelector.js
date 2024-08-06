@@ -12,14 +12,17 @@ const CurrencySelector = () => {
     setSearch(event.target.value);
   };
 
-  const handleCurrencySelect = (currency) => {
-    setSelectedCurrency(currency);
-    router.push(`/Country_Conversion?currency=${currency}`);
-  };
-
+  
   const filteredCurrencies = Object.entries(country_list).filter(([currency]) =>
     currency.toLowerCase().includes(search.toLowerCase())
   );
+
+
+
+  const handleCurrencySelect = (currency) => {
+    setSelectedCurrency(currency);
+    router.push(`/Currency_Conversion?currency=${currency}`);
+  };
 
   return (
     <div className={styles.currencySelector}>
@@ -36,6 +39,7 @@ const CurrencySelector = () => {
           <div
             key={currency}
             className={`${styles.currencyItem} ${selectedCurrency === currency ? styles.selected : ''}`}
+            
             onClick={() => handleCurrencySelect(currency)}
           >
             {currency}
@@ -45,5 +49,6 @@ const CurrencySelector = () => {
     </div>
   );
 };
+
 
 export default CurrencySelector;

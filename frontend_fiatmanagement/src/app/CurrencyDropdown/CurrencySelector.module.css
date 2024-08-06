@@ -1,51 +1,53 @@
 .currencySelector {
-    background-color: #121212;
-    color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 380px;
-    height: 750px;
-  }
-  
-  .searchInput {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background-color: #1e1e1e;
-    color: #ffffff;
-  }
-  
-  .currencyList {
-    max-height: 620px;
-    overflow-y: auto;
-  }
-  
-  .currencyItem {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    background-color: #1e1e1e;
-  }
-  
-  .currencyItem.selected {
-    background-color: #333;
-  }
-  
-  .currencyItem:hover {
-    background-color: #333;
-  }
-  
-  /* Hide scrollbar for Webkit browsers */
-  .currencyList::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Hide scrollbar for other browsers */
-  .currencyList {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-  
+  background-color: #121212;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  height: 550px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+.currencyList {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.currencyItem {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  background-color: #1e1e1e;
+}
+
+.currencyItem.selected {
+  background-color: #f2eeee;
+}
+
+.currencyItem:hover {
+  background-color: #333;
+}
+
+/* Hide scrollbar for Webkit browsers */
+.currencyList::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for other browsers */
+.currencyList {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.flags{
+  width: 10px;
+}
