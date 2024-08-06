@@ -1,10 +1,10 @@
 "use client";
-import CurrencySelector from './CurrencySelector';
+import PaymentOptions from './PaymentOptions'
 
 const CurrencyPage = () => {
   return (
     <div className="container">
-      <CurrencySelector />
+      <PaymentOptions />
       <style jsx>{`
         .container {
           display: flex;
