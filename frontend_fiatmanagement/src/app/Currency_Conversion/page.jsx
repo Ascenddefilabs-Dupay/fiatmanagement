@@ -6,22 +6,22 @@ import country_list from '../currency-conversion/country-list';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { FaArrowLeft, FaEllipsisV } from 'react-icons/fa';
-import { FaChevronRight } from 'react-icons/fa';
+import { FaArrowLeft, FaEllipsisV, FaChevronRight } from 'react-icons/fa';
+import networkOptions from '../NetworkPage/NetworkOptions'
 
 const CurrencyConverter = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectedCurrency = searchParams.get('currency');
 
-    const [fromCurrency, setFromCurrency] = useState('ETH');
+    const [fromCurrency, setFromCurrency] = useState('ETH'); // Default value
     const [toCurrency, setToCurrency] = useState('INR');
     const [amount, setAmount] = useState('0');
     const [result, setResult] = useState('');
     const [error, setError] = useState('');
     const [showBottomSheet, setShowBottomSheet] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [network, setNetwork] = useState('OP Mainnet');
+    const [network, setNetwork] = useState('OP Mainnet'); // Default value
     const [buy, setBuy] = useState('ETH');
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [credit, setCredit] = useState('IMPS');
@@ -34,6 +34,14 @@ const CurrencyConverter = () => {
             setShowBottomSheet(true);
         }
     }, [selectedCurrency]);
+
+    useEffect(() => {
+        const storedNetwork = localStorage.getItem('selectedNetwork');
+        if (storedNetwork) {
+            setNetwork(storedNetwork);
+            setFromCurrency(storedNetwork); // Update fromCurrency to the selected network
+        }
+    }, []);
 
     const isFiatCurrency = (currency) => {
         return country_list.hasOwnProperty(currency);
@@ -54,7 +62,7 @@ const CurrencyConverter = () => {
                 const conversionRate = response.data[toCurrency];
                 const cryptoValue = parseFloat(amount) / conversionRate;
 
-                setResult(cryptoValue.toFixed(2));
+                setResult(cryptoValue.toFixed(5));
                 setError('');
             } else {
                 setError('Invalid currency selection or unsupported conversion');
@@ -124,19 +132,24 @@ const CurrencyConverter = () => {
 
         setAmount(value);
     };
-
+    
+    const navigateToBuy = () => {
+        router.push('/BuyPage');
+    };
     const togglePaymentOptions = () => {
         setShowPaymentOptions(!showPaymentOptions);
     };
 
     const navigateToPaymentOptions = () => {
         router.push('/PaymentOptions');
-        
     };
 
     const navigateToCurrencySelector = () => {
         router.push('/CurrencyDropdown');
-        
+    };
+
+    const navigateToNetworkSelector = () => {
+        router.push('/NetworkPage');
     };
 
     return (
@@ -157,7 +170,7 @@ const CurrencyConverter = () => {
                     value={amount === '' ? '0' : amount}
                     onChange={handleAmountChange}
                     className="amountInput"
-                    placeholder="{Enter amount in ${toCurrency}}"
+                    placeholder={`Enter amount in ${toCurrency}`}
                 />
                 <div className="amountContainer">
                     <span className="amountLabel">{toCurrency}</span>
@@ -181,55 +194,35 @@ const CurrencyConverter = () => {
 
             <div className="paymentInfo" onClick={toggleDropdown}>
                 <hr />
-                <div className="networkInfo">
+                <button className="networkInfo" onClick={navigateToNetworkSelector}>
                     <img src="/images/network.jpeg" alt="Network" className="icon" />
                     <span className="smallText">Network:</span>
-                    <div className="select-box">
-                        <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
-                            {/* Add your options here */}
-                            <option value="BTC">Bitcoin (BTC)</option>
-                            <option value="ETH">Ethereum (ETH)</option>
-                            <option value="USDT">Tether (USDT)</option>
-                            <option value="BNB">Binance Coin (BNB)</option>
-                            <option value="USDC">USD Coin (USDC)</option>
-                            <option value="XRP">XRP (XRP)</option>
-                            <option value="BUSD">Binance USD (BUSD)</option>
-                            <option value="ADA">Cardano (ADA)</option>
-                            <option value="DOGE">Dogecoin (DOGE)</option>
-                            <option value="MATIC">Polygon (MATIC)</option>
-                            <option value="SOL">Solana (SOL)</option>
-                            <option value="DOT">Polkadot (DOT)</option>
-                            <option value="SHIB">Shiba Inu (SHIB)</option>
-                            <option value="LTC">Litecoin (LTC)</option>
-                            <option value="TRX">Tron (TRX)</option>
-                            <option value="AVAX">Avalanche (AVAX)</option>
-                        </select>
-                    </div>
-                </div>
+                    <span className="networkDisplay">{network}</span>
+                    <FaChevronRight className="arrow"></FaChevronRight> 
+                </button>
+
+
+
                 <div className="paymentDetails">
-                    <div className="paymentRow" onClick={toggleDropdown}>
+                    <div className="paymentRow" onClick={navigateToBuy}>
                         <img src="/images/buy.jpeg" alt="Buy" className="icon" />
                         <div className="paymentTextContainer">
                             <div className="buyContainer">
                                 <span className="buyText">Buy</span>
-                                {/* <i className="fas fa-chevron-right buyIcon"></i> */}
+                                <FaChevronRight className="buyIcon" />
+                                <div class="spacer"></div>
                                 <span className="currencyText">{fromCurrency}</span>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="paymentDetails" onClick={navigateToPaymentOptions}>
-                    <div className="paymentRow">
+                    <div className="separator"></div> {/* Vertical line */}
+                    <div className="paymentRow" onClick={navigateToPaymentOptions}>
                         <img src="/images/paywith.png" alt="Pay with" className="icon" />
                         <div className="textContainer">
-                            <span>Pay with</span>
+                            <span className='pay'>Pay with</span>
                             <FaChevronRight className="buyIcon2" />
-                            <div>{credit}</div>
-                        </div>
-                    </div>
-                    <div className="paymentRow">
-                        <div className="textContainer">
-                            <div className="usingContainer"></div>
+                            <div class="spacer"></div>
+                            <div className='credit'>{credit}</div>
                         </div>
                     </div>
                 </div>
@@ -247,7 +240,7 @@ const CurrencyConverter = () => {
                     </button>
                 ))}
             </div>
-            <hr />
+            
             <button className="continueButton" onClick={handleContinue}>
                 Continue
             </button>
