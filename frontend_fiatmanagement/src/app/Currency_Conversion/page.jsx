@@ -145,8 +145,8 @@ const CurrencyConverter = () => {
                 <button className="topBarButton">
                     <FaArrowLeft className="topBarIcon" />
                 </button>
-                <div className="topBarTitle">Buy</div>
-                <button className="topBarButton" onClick={toggleBottomSheet}>
+                <div className="topBarTitle1">Buy</div>
+                <button className="topBarButton1" onClick={toggleBottomSheet}>
                     <FaEllipsisV className="topBarIcon" />
                 </button>
             </div>
@@ -212,7 +212,7 @@ const CurrencyConverter = () => {
                         <div className="paymentTextContainer">
                             <div className="buyContainer">
                                 <span className="buyText">Buy</span>
-                                <i className="fas fa-chevron-right buyIcon"></i>
+                                {/* <i className="fas fa-chevron-right buyIcon"></i> */}
                                 <span className="currencyText">{fromCurrency}</span>
                             </div>
                         </div>
