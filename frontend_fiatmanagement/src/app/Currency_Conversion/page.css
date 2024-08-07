@@ -4,7 +4,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full viewport height */
+    /* height: 100vh; Full viewport height */
     background-color: #f4f4f4; /* Optional background color */
 }
 
@@ -20,24 +20,14 @@ body {
     position: relative;
     justify-content: space-between;
     width: 320px; /* Set width to 320px */
-    height: 650px; /* Set height to 600px */
-    overflow: hidden; /* Disable scrolling */
+    height: 600px; /* Set height to 600px */
+    
 }
 
 /* Hide scrollbar for WebKit browsers */
-.converterContainer::-webkit-scrollbar {
-    display: none;
-}
-
-/* Hide scrollbar for Firefox */
-.converterContainer {
-    scrollbar-width: none; /* Firefox */
-}
 
 /* Hide scrollbar for Internet Explorer and Edge */
-.converterContainer {
-    -ms-overflow-style: none; /* Internet Explorer and Edge */
-}
+
 
 
 .networkInfo {
@@ -52,6 +42,7 @@ body {
     border: 1px solid #666;
     border-radius: 4px;
     z-index: 1;
+    
 }
 
 .dropdownItem {
@@ -101,10 +92,7 @@ body {
     justify-content: space-between;
 }
 
-.paymentDetails {
-    align-items: center;
-    justify-content: space-between;
-}
+
 
 .paymentRow span {
     flex: 1;
@@ -145,6 +133,7 @@ body {
 .error {
     color: red;
     font-size: 12px;
+    margin-left:13px ;
 }
 
 .keypad {
@@ -210,6 +199,8 @@ body {
 .networkInfo {
     display: flex;
     align-items: center;
+    
+    
 }
 
 .networkInfo .icon {
@@ -220,12 +211,7 @@ body {
     font-size: 14px; /* Adjust font size as needed */
 }
 
-.paymentDetails {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Align items horizontally */
-    margin: 10px 0;
-}
+
 
 .paymentRow {
     display: flex;
@@ -250,17 +236,18 @@ body {
     align-items: center; /* Align items horizontally */
     justify-content: space-between; /* Align items horizontally */
     margin: 10px 0;
+    margin-left:13px ;
 }
 
 .buyIcon {
-    margin-right: -190px; /* Adjust spacing between currency and icon */
+    margin-right: -215px; /* Adjust spacing between currency and icon */
     font-size: 12px; /* Adjust size as needed */
 }
 
 .buyIcon2 {
     font-size: 12px; /* Adjust size as needed */
     color: #f5f3f3; /* Adjust color as needed */
-    margin-right: -30cm;
+    margin-left: 242px;
 }
 
 .bottomSheet {
@@ -272,7 +259,7 @@ body {
     right: 0;
     border-radius: 8px;
     padding: 10px; /* Reduce padding */
-    height: 100px;
+    height: 70px;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
     border-top: 1px solid #333;
 }
@@ -320,7 +307,7 @@ body {
     width: 100%; /* Adjust to desired width, or use specific width e.g. 300px */
     height: auto;
     margin-top: 10px; /* Adjust to desired height, or use specific height e.g. 40px */
-    margin: 0 auto; /* Centering the box within its container */
+    margin-right: -50px; /* Centering the box within its container */
 }
 
 .select-box select {
@@ -346,7 +333,8 @@ body {
     flex-direction: column;
     align-items: flex-start;
     padding: 0;
-    margin: 0; /* Remove margin */
+    margin-top: 10px; /* Remove margin */
+    margin-left:13px ;
 }
 
 .paymentRow {
@@ -413,9 +401,7 @@ body {
     margin-right: auto; /* Pushes the arrow icon to the right */
 }
 
-.buyIcon2 {
-    margin-left: 230px; /* Pushes the icon to the right */
-}
+
 
 .usingContainer {
     display: flex;
@@ -455,11 +441,7 @@ body {
      /* Move button left */
 }
 
-.topBarTitle {
-    font-size: 22px;
-    font-weight: bold;
-    margin-left: 15px; /* Space between title and back button */
-}
+
 
 .rightContainer {
     display: flex;
@@ -473,14 +455,7 @@ body {
     align-items: center;
     cursor: pointer;
 }
-.buyIcon3{
-    margin-left: -20px;
-    font-size: 20px;
-}
-.buyIcon4{
-    margin-right: -10px;
-    font-size: 20px;
-}
+
 
 .dots {
     width: 5px;
@@ -509,6 +484,7 @@ body {
     font-size: 28px; /* Adjust font size */
     padding: 0; /* Adjust padding as needed */
     margin-bottom: 0; /* Ensure no space below the input */
+    margin-left:13px ;
 }
 
 .amountDisplay.large .amountLabel {
@@ -526,6 +502,7 @@ body {
     outline: none;
     padding: 0; /* Remove padding */
     margin-bottom: 0; /* Ensure no space below the input */
+    margin-left:14px ;
 }
 
 .amountContainer {
@@ -549,4 +526,18 @@ body {
     color: #fff;
     cursor: pointer;
     font-size: 24px;
+    margin-left:13px ;
+}
+.topBarButton1 {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 24px;
+    margin-right: 10px;
+}
+.topBarTitle1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-left: -190px; /* Space between title and back button */
 }

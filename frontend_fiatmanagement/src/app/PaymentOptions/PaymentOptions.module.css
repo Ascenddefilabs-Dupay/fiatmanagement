@@ -14,7 +14,7 @@
 }
 
 .paymentOptions {
-    max-height: 435px; /* Adjust height as needed */
+    max-height: 470px; /* Adjust height as needed */
     overflow-y: auto; /* Enable vertical scrolling */
     overflow-x: hidden; /* Hide horizontal scroll */
     scrollbar-width: none; /* For Firefox */
