@@ -20,7 +20,7 @@ body {
     position: relative;
     justify-content: space-between;
     width: 320px; /* Set width to 320px */
-    height: 600px; /* Set height to 600px */
+    height: 550px; /* Set height to 600px */
     
 }
 
@@ -33,28 +33,6 @@ body {
 .networkInfo {
     color: #aaa;
 }
-
-.dropdown {
-    position: absolute;
-    right: 2px;
-    top: 40px;
-    background-color: #333;
-    border: 1px solid #666;
-    border-radius: 4px;
-    z-index: 1;
-    
-}
-
-.dropdownItem {
-    padding: 10px;
-    cursor: pointer;
-    color: #fff;
-}
-
-.dropdownItem:hover {
-    background-color: #444;
-}
-
 .paymentInfo {
     width: 100%;
     display: flex;
@@ -104,8 +82,8 @@ body {
 }
 
 .icon {
-    width: 20px; /* Adjust the size as needed */
-    height: 20px; /* Adjust the size as needed */
+    width: 24px; /* Adjust the size as needed */
+    height: 24px; /* Adjust the size as needed */
     border-radius: 50%;
     object-fit: cover; /* Ensures the image covers the container without distortion */
     margin-right: -10px;
@@ -140,19 +118,21 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     margin: 10px 0;
-    gap: 5px;
+    gap: 3px;
     width: 100%;
+    margin-top: 5px;
 }
 
 .keypadButton {
     background-color: #000;
     color: #fff;
     border: none;
-    padding: 10px; /* Reduce padding */
+    padding: 8px; /* Reduce padding */
     font-size: 18px;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .changeCurrency {
@@ -191,8 +171,8 @@ body {
 }
 
 .imageIcon {
-    width: 20px; /* Adjust the size as needed */
-    height: 20px; /* Adjust the size as needed */
+    width: 24px; /* Adjust the size as needed */
+    height: 24px; /* Adjust the size as needed */
     margin-right: 10px; /* Adjust spacing as needed */
 }
 
@@ -220,8 +200,8 @@ body {
 
 .paymentRow img {
     margin-right: 10px;
-    width: 18px; /* Adjust image size */
-    height: 18px; /* Space between icon and text */
+    width: 24px; /* Adjust image size */
+    height: 24px; /* Space between icon and text */
 }
 
 .paymentRow div {
@@ -239,15 +219,14 @@ body {
     margin-left:13px ;
 }
 
-.buyIcon {
-    margin-right: -215px; /* Adjust spacing between currency and icon */
-    font-size: 12px; /* Adjust size as needed */
-}
+
 
 .buyIcon2 {
     font-size: 12px; /* Adjust size as needed */
     color: #f5f3f3; /* Adjust color as needed */
     margin-left: 242px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .bottomSheet {
@@ -308,6 +287,7 @@ body {
     height: auto;
     margin-top: 10px; /* Adjust to desired height, or use specific height e.g. 40px */
     margin-right: -50px; /* Centering the box within its container */
+    
 }
 
 .select-box select {
@@ -315,9 +295,10 @@ body {
     height: auto; /* Adjust to fit the height of the container */
     padding: 4px; /* Adjust padding as needed */
     font-size: 12px;
-    background-color: #555; /* Adjust font size as needed */
+    background-color: white; /* Adjust font size as needed */
     border: 1px solid #007bff; /* Border styling */
     border-radius: 4px; /* Rounded corners */
+    font-weight: bold;
     box-sizing: border-box; /* Ensure padding and border are included in width/height */
 }
 
@@ -346,8 +327,8 @@ body {
 }
 
 .paymentRow .icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     margin-right: 10px; /* Adjust as needed */
 }
 
@@ -368,17 +349,22 @@ body {
     padding: 0; /* Remove padding */
 }
 
-.buyText {
-    margin: 0;
-    padding: 0;
-    margin-right: 250px; /* Space between 'Buy' text and currency text */
-}
 
-.currencyText {
+.pay {
     margin: 0;
     padding: 0;
     margin-right: 250px;
+    margin-bottom: 0; /* Space between 'Buy' text and currency text */
 }
+.credit {
+    margin: 0;
+    padding: 0;
+    margin-right: 250px;
+    margin-bottom: 0; /* Space between 'Buy' text and currency text */
+    width:50%;
+}
+
+
 .paymentTextContainer{
     display: flex;
     align-items: center;
@@ -485,19 +471,21 @@ body {
     padding: 0; /* Adjust padding as needed */
     margin-bottom: 0; /* Ensure no space below the input */
     margin-left:13px ;
+    
 }
 
 .amountDisplay.large .amountLabel {
     font-size: 18px; /* Match the font size */
     margin-bottom: 0; /* Ensure no space below the label */
     margin-right: 20px;
+    
 }
 
 .amountInput {
     background: none;
     border: none;
     color: #42a5f5;
-    font-size: 18px;
+    font-size: 14px;
     width: 100%; /* Full width */
     outline: none;
     padding: 0; /* Remove padding */
@@ -511,6 +499,7 @@ body {
     align-items: flex-start; /* Align items to the start */
     margin: 0; /* Remove top margin */
     padding: 0; /* Remove padding */
+    width:45%;
 }
 
 .amountLabel {
@@ -519,6 +508,7 @@ body {
     padding: 0; /* Remove padding */
     margin-top: 0; /* Remove top margin */
     margin-right: 20px;
+    
 }
 .topBarButton {
     background: none;
@@ -541,3 +531,139 @@ body {
     font-weight: bold;
     margin-left: -190px; /* Space between title and back button */
 }
+
+.separator {
+    width: 3px;
+    height: 20px; /* Adjust height as needed */
+    background-color: #ccc; /* Adjust color as needed */
+    margin: 0 15px; /* Adjust spacing as needed */
+    margin-left: 8px;
+}
+
+
+
+/* Styling for the network button */
+
+
+/* Hover effect for the button */
+.networkDisplay:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+.networkInfo {
+    display: flex;
+    align-items: center;
+    background-color: #1A1A1A; /* Dark background color */
+    border: 1px solid #333; /* Border color */
+    border-radius: 10px; /* Rounded corners */
+    padding: 7px 15px;
+    cursor: pointer;
+    color: white; /* Text color */
+    width:65%;
+}
+
+.networkInfo .icon {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.networkInfo .smallText {
+    margin-right: 5px;
+}
+
+.networkInfo .networkDisplay {
+    font-weight: bold;
+}
+
+.networkInfo .arrow {
+    margin-left: auto; /* Push arrow to the right */
+    font-size: 1.2em;
+    color: #888; /* Arrow color */
+}
+.paymentTextContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.buyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+
+
+.currencyText {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    margin: 0;
+    padding: 0;
+    margin-right: 135px;
+    margin-top: 0;
+    width:50%;
+}
+
+.buyText {
+    margin: 0;
+    
+    margin-right: 135px;
+    margin-top: 0;
+    width:50%;
+    
+}
+
+
+.buyIcon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 110px;
+    font-size: 12px; /* Adjust size as needed */
+    margin-top: 2px;
+    
+    
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-bottom: 5px;
+    padding:5px;
+}
+
+.credit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.pay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    
+    
+}
+
+.buyIcon2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 97px;
+    font-size: 12px; /* Adjust size as needed */
+    margin-top: 0;
+    margin-bottom: 0;
+    
+}
+.spacer {
+    width: 15px; /* Adjust the space as needed */
+}
+

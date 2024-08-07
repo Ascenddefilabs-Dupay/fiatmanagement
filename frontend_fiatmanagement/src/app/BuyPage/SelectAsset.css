@@ -1,0 +1,88 @@
+/* pages/SelectAsset.css */
+.assetContainer {
+    width: 320px;
+    height: 550px;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.topBar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    /* background-color: #1a1a1a; */
+}
+
+.topBarButton {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.topBarTitle {
+    flex: 1;
+    text-align: center;
+    font-size: 24px;
+}
+
+.searchBar {
+    padding: 10px;
+    background-color: #1a1a1a;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+}
+
+.assetList {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.assetList::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
+.assetItem {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #1a1a1a;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.assetIcon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.assetInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.assetName {
+    font-size: 16px;
+}
+
+.assetSymbol {
+    font-size: 14px;
+    color: #777;
+}
