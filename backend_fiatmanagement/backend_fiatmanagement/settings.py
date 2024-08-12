@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 
@@ -58,7 +59,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend_fiatmanagement.urls'
 
@@ -83,7 +84,18 @@ WSGI_APPLICATION = 'backend_fiatmanagement.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#data
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django_cockroachdb',
+        'NAME': 'fiat',  # Replace with your database name
+        'USER': 'vikram',  # Replace with your SQL user
+        'PASSWORD': 'ttJguK_ziqY_wiitOorAyA',  # Replace with your SQL user password
+        'HOST': 'jasper-warthog-5516.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'PORT': '26257',
+        'sslmode': 'disable',
+        
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
