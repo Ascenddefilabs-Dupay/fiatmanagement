@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ProjectViewSet
 from currency_converter import views
+from .views import BankViewSet
 
 router = DefaultRouter()
 
@@ -16,4 +17,14 @@ router.register(r'currencies', views.CurrencyViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
+]
+
+
+
+
+router = DefaultRouter()
+router.register(r'banks', BankViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
 ]

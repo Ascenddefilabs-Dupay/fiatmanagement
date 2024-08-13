@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Project
+from .models import Bank
 from .serializers import ProjectSerializer
+from .serializers import BankSerializer
 from .serializers import FiatWalletSerializer,UserSerializer
 from .models import FiatWallet
 from .models import User
@@ -26,3 +28,6 @@ class UserViewSet(viewsets.ModelViewSet):
 class CurrencyViewSet(viewsets.ModelViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+class BankViewSet(viewsets.ModelViewSet):
+    queryset = Bank.objects.all()
+    serializer_class = BankSerializer
