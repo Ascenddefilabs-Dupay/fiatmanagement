@@ -118,3 +118,10 @@ class Currency(models.Model):
 
     def __str__(self):
         return f"{self.currency_country} - {self.currency_code}"
+class Bank(models.Model):
+    bank_name = models.CharField(max_length=100, unique=True)
+    bank_icon = models.FileField(upload_to='bank_icons', blank=True, null=True)  # Use FileField for consistency
+
+    def __str__(self):
+        return self.bank_name
+

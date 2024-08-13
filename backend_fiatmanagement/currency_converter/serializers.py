@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Project
+from .models import Bank
 from .models import FiatWallet,User
 from .models import Currency
 
@@ -8,6 +9,15 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
 
+class BankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bank
+        fields = '__all__'
+
+    def validate_bank_name(self, value):
+        if Bank.objects.filter(bank_name=value).exists():
+            raise serializers.ValidationError("Bank name already exists.")
+        return value
 
 
 

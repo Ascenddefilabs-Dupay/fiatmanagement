@@ -91,19 +91,20 @@ WSGI_APPLICATION = 'backend_fiatmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_cockroachdb',
-        'NAME': 'fiat',  # Replace with your database name
-        'USER': 'vikram',  # Replace with your SQL user
-        'PASSWORD': 'ttJguK_ziqY_wiitOorAyA',  # Replace with your SQL user password
-        'HOST': 'jasper-warthog-5516.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'NAME': 'users',
+        'USER': 'manikrishna',
+        'PASSWORD': 'x5ky45s0EArfJ_p7fz-3Pw',
+        'HOST': 'ghost-colt-7185.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
         'PORT': '26257',
-        'sslmode': 'disable',
-        
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
     }
 }
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dvjtn2d0c',
-    'API_KEY': '251497581718865',
-    'API_SECRET': 'JRS_omQx9fDTehB-VicTDu3G7bQ'
+    'CLOUD_NAME': 'dhyuqscdu',
+    'API_KEY': '729466293685987',
+    'API_SECRET': 'GnYO_kYGxabPOJBicGUvCnOGrWc'
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
