@@ -3,6 +3,7 @@ import uuid
 from django.core.validators import RegexValidator
 from django.db.models import Max
 import random
+from cloudinary.models import CloudinaryField # type: ignore
 
 # Create your models here.
 class Project(models.Model):
@@ -106,3 +107,14 @@ class FiatWallet(models.Model):
             self.user = default_user
 
         super().save(*args, **kwargs)
+
+
+class Currency(models.Model):
+    currency_code = models.CharField(max_length=10, unique=True)
+    currency_country = models.CharField(max_length=100,unique=True)
+    currency_icon = models.ImageField(upload_to='currency_icons/')
+    currency_icon=models.FileField(upload_to='photos',unique=True, blank=True,null=True)
+
+
+    def __str__(self):
+        return f"{self.currency_country} - {self.currency_code}"

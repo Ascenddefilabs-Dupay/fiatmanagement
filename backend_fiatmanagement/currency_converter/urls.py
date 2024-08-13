@@ -12,6 +12,7 @@ router.register('projects',ProjectViewSet)
 
 router.register(r'fiat_wallets', views.FiatWalletViewSet)
 router.register(r'user', views.UserViewSet)
+router.register(r'currencies', views.CurrencyViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
