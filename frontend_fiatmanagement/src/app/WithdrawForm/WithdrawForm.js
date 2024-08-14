@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import styles from './DepositForm.module.css';
+import styles from './WithdrawForm.module.css';
 import { FaArrowLeft } from 'react-icons/fa';
-import CustomDropdown from './DropDown';
+import CustomDropdown from '../DepositForm/DropDown';
 import axios from 'axios';
 
-const DepositForm = () => {
+const WithdrawForm = () => {
     const [balances, setBalances] = useState({
         INR: 0.00,
         USD: 0.00,
@@ -17,7 +17,6 @@ const DepositForm = () => {
     const [currencies, setCurrencies] = useState([]);
     const [walletDetails, setWalletDetails] = useState(null);
     const [loading, setLoading] = useState(false);
-
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
@@ -39,7 +38,7 @@ const DepositForm = () => {
     const handleAmountChange = (e) => {
         let inputValue = e.target.value;
         const validInput = /^[0-9]*\.?[0-9]*$/;
-        
+
         if (!validInput.test(inputValue)) {
             return;
         }
@@ -67,51 +66,56 @@ const DepositForm = () => {
         setSelectedCurrency(option.value);
     };
 
-    const handleDeposit = () => {
-    if (loading) return;  // Prevent multiple clicks if already loading
+    const handleWithdraw = () => {
+        if (loading) return;  // Prevent multiple clicks if already loading
 
-    setSubmitted(true);
-    setLoading(true);  // Set loading to true
+        setSubmitted(true);
+        setLoading(true);  // Set loading to true
 
-    const parsedAmount = parseFloat(amount);
+        const parsedAmount = parseFloat(amount);
 
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-        setError('Please enter a valid amount greater than zero.');
-        setLoading(false);  // Reset loading state
-        return;
-    }
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            setError('Please enter a valid amount greater than zero.');
+            setLoading(false);  // Reset loading state
+            return;
+        }
 
-    if (!walletDetails) {
-        setError('Wallet details are not loaded.');
-        setLoading(false);  // Reset loading state
-        return;
-    }
+        if (!walletDetails) {
+            setError('Wallet details are not loaded.');
+            setLoading(false);  // Reset loading state
+            return;
+        }
 
-    const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) + parsedAmount;
+        if (parsedAmount > balances[selectedCurrency]) {
+            setError('Insufficient balance.');
+            setLoading(false);  // Reset loading state
+            return;
+        }
 
-    axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
-        ...walletDetails,
-        fiat_wallet_balance: newBalance,
-    })
-    .then(response => {
-        setBalances(prevBalances => ({
-            ...prevBalances,
-            [selectedCurrency]: prevBalances[selectedCurrency] + parsedAmount
-        }));
-        setAmount('');
-        setError('');
-        setSubmitted(false);
-        alert('Amount Deposited successfully!');
-    })
-    .catch(error => {
-        setError('An error occurred while depositing the amount.');
-        console.error('Error depositing amount:', error);
-    })
-    .finally(() => {
-        setLoading(false);  // Reset loading state
-    });
-};
+        const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) - parsedAmount;
 
+        axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
+            ...walletDetails,
+            fiat_wallet_balance: newBalance,
+        })
+        .then(response => {
+            setBalances(prevBalances => ({
+                ...prevBalances,
+                [selectedCurrency]: prevBalances[selectedCurrency] - parsedAmount
+            }));
+            setAmount('');
+            setError('');
+            setSubmitted(false);
+            alert('Withdrawn successfully!');
+        })
+        .catch(error => {
+            setError('An error occurred while withdrawing the amount.');
+            console.error('Error withdrawing amount:', error);
+        })
+        .finally(() => {
+            setLoading(false);  // Reset loading state
+        });
+    };
 
     const currencyOptions = currencies.map(currency => ({
         value: currency.currency_code,
@@ -125,7 +129,7 @@ const DepositForm = () => {
                 <button className={styles.topBarButton}>
                     <FaArrowLeft className={styles.topBarIcon} />
                 </button>
-                <h2 className={styles.topBarTitle}>Deposit</h2>
+                <h2 className={styles.topBarTitle}>Withdraw</h2>
             </div>
             <div className={styles.cardContainer}>
                 {Object.keys(balances).map(currencyCode => (
@@ -168,20 +172,18 @@ const DepositForm = () => {
                     value={selectedCurrency}
                     onChange={handleCurrencyChange}
                 />
+
                 <button
                     type="button"
                     className={styles.submitButton}
-                    onClick={handleDeposit}
+                    onClick={handleWithdraw}
                     disabled={loading}  // Disable button when loading
                 >
-                    {loading ? 'Processing...' : 'SUBMIT'}
+                    {loading ? 'Processing...' : 'WITHDRAW'}
                 </button>
-                {/* <button type="button" className={styles.submitButton} onClick={handleDeposit}>
-                    SUBMIT
-                </button> */}
             </div>
         </div>
     );
 };
 
-export default DepositForm;
+export default WithdrawForm;
