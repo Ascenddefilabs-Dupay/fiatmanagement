@@ -8,6 +8,7 @@
     flex-direction: column;
     border-radius: 10px;
     overflow: hidden;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .topBar {

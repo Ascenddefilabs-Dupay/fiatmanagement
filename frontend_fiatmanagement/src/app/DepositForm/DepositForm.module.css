@@ -1,0 +1,151 @@
+.container {
+  padding: 30px;
+  border-radius: 8px;
+  height: 550px;
+  width: 320px;
+  margin: 0 auto;
+  margin-top: 70px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: black;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 0;
+  font-size: 24px;
+  color: white;
+}
+
+
+
+.heading {
+  flex-grow: 1;
+  text-align: center;
+  margin-top: 0;
+  font-size: 24px;
+}
+
+.cardContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.balanceCard {
+  width: 48%; /* Adjusted width to fit two cards side by side */
+  /* padding: 20px; */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+.input {
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #2a2a2a;
+  color: white; /* Text color inside the input field */
+}
+
+.currency {
+  margin: 0;
+  font-size: 20px;
+}
+
+.country {
+  font-size: 12px;
+  color: #888;
+}
+
+.balanceLabel {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  color: black;
+}
+
+.balanceAmount {
+  margin: 5px 0 0 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input {
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color:  #2a2a2a;
+}
+.label{
+  color: white;
+}
+
+.select {
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 16px;
+  
+}
+
+.submitButton {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 3px;
+  margin-bottom: 5px;
+}
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Add spacing between icon and title if needed */
+  margin-bottom: 30px;
+
+}
+
+.topBarButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.topBarIcon {
+  font-size: 18px; /* Adjust size if needed */
+  color: white;
+}
+
+.topBarTitle {
+  font-size: 24px;
+  color: white;
+  
+}
+.currencySelectContainer {
+  display: flex;
+  align-items: center;
+}
+
+.currencyIcon {
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+}
