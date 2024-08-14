@@ -14,6 +14,7 @@ router.register('projects',ProjectViewSet)
 router.register(r'fiat_wallets', views.FiatWalletViewSet)
 router.register(r'user', views.UserViewSet)
 router.register(r'currencies', views.CurrencyViewSet)
+router.register(r'banks', BankViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
@@ -22,9 +23,4 @@ urlpatterns = [
 
 
 
-router = DefaultRouter()
-router.register(r'banks', BankViewSet)
 
-urlpatterns = [
-    path('', include(router.urls)),
-]

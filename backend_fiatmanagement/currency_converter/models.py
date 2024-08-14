@@ -56,7 +56,7 @@ class FiatWallet(models.Model):
         max_digits=18, 
         decimal_places=8, 
         default=0, 
-        editable=False
+        
     )
     fiat_wallet_created_time = models.DateTimeField(auto_now_add=True)
     fiat_wallet_updated_time = models.DateTimeField(auto_now=True)

@@ -91,10 +91,10 @@ WSGI_APPLICATION = 'backend_fiatmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_cockroachdb',
-        'NAME': 'users',
-        'USER': 'manikrishna',
-        'PASSWORD': 'x5ky45s0EArfJ_p7fz-3Pw',
-        'HOST': 'ghost-colt-7185.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
+        'NAME': 'wallet',
+        'USER': 'vikram',
+        'PASSWORD': 'ttJguK_ziqY_wiitOorAyA',
+        'HOST': 'jasper-warthog-5516.7s5.aws-ap-south-1.cockroachlabs.cloud',
         'PORT': '26257',
         'OPTIONS': {
             'sslmode': 'require',
