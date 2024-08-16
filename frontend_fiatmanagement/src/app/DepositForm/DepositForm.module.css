@@ -12,7 +12,7 @@
 
 .header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 0px;
   margin-top: 0;
   font-size: 24px;
   color: white;
@@ -31,10 +31,12 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+  margin-left: 3px;
 }
 
 .balanceCard {
-  width: 48%; /* Adjusted width to fit two cards side by side */
+  width: auto; /* Adjusted width to fit two cards side by side */
+  min-width: 48%;
   /* padding: 20px; */
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -84,19 +86,23 @@
   border: 1px solid #555;
   border-radius: 4px;
   font-size: 16px;
-  background-color:  #2a2a2a;
+  
 }
 .label{
   color: white;
 }
 
 .select {
-  padding: 8px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  font-size: 16px;
   
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    
+
+    
 }
+  
 
 .submitButton {
   padding: 10px;
@@ -148,4 +154,94 @@
   width: 20px;
   height: 20px;
   margin-left: 8px;
+}
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Add spacing between icon and title if needed */
+  margin-bottom: 30px; /* Decrease the bottom margin to move up */
+  margin-top: 1px; /* Adjust this value to move up */
+}
+
+.topBarButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 0; /* Remove or adjust this if needed */
+}
+
+.topBarIcon {
+  margin-top: 5px;
+  font-size: 18px; /* Adjust size if needed */
+  color: white;
+}
+
+.topBarTitle {
+  font-size: 24px;
+  color: white;
+  margin-top: 0; /* Remove or adjust this if needed */
+}
+.customAlert {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: gray;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+  width: 20%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.customAlert p {
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+.closeButton {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+}
+.bankOption {
+  display: flex;
+  align-items: center;
+  background-color:  #2a2a2a;
+}
+
+.bankIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  margin-left: 1px;
+}
+.currencyOption {
+  display: flex;
+  align-items: center;
+}
+
+.currencyIcon {
+  width: 20px;
+  height: 20px;
+  margin-left: 1px;
+  margin-right: 8px;
+
+}
+.currencyInfo {
+  display: flex;
+  align-items: center;
+}
+
+.currencyIconInCard {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  margin-left: 20px;
 }
