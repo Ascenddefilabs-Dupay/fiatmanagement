@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import styles from './WithdrawForm.module.css';
 import { FaArrowLeft } from 'react-icons/fa';
-import CustomDropdown from '../DepositForm/DropDown';
 import axios from 'axios';
+import Select from 'react-select';
+import styles from './WithdrawForm.module.css';
 
 const WithdrawForm = () => {
     const [balances, setBalances] = useState({
         INR: 0.00,
         USD: 0.00,
+        GBP: 0.00, 
+        EUR: 0.00, 
+        AUD: 0.00, 
+        CAD: 0.00, 
     });
-
     const [amount, setAmount] = useState('');
-    const [selectedCurrency, setSelectedCurrency] = useState('INR');
+    const [selectedCurrency, setSelectedCurrency] = useState({ value: 'INR', label: 'INR' });
+    const [selectedBank, setSelectedBank] = useState(null);
+    const [banks, setBanks] = useState([]);
     const [error, setError] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [currencies, setCurrencies] = useState([]);
     const [walletDetails, setWalletDetails] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [alertMessage, setAlertMessage] = useState(''); 
+    const [pendingAmount, setPendingAmount] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
@@ -33,6 +40,10 @@ const WithdrawForm = () => {
             .then(response => response.json())
             .then(data => setCurrencies(data))
             .catch(error => console.error('Error fetching currencies:', error));
+
+        axios.get('http://localhost:8000/api/banks/')
+            .then(response => setBanks(response.data))
+            .catch(error => console.error('Error fetching banks:', error));
     }, []);
 
     const handleAmountChange = (e) => {
@@ -63,90 +74,148 @@ const WithdrawForm = () => {
     };
 
     const handleCurrencyChange = (option) => {
-        setSelectedCurrency(option.value);
+        setSelectedCurrency(option);
     };
 
+    const handleBankChange = (option) => {
+        setSelectedBank(option);
+    };
+
+    const bankOptions = banks.map(bank => ({
+        value: bank.id,
+        label: (
+            <div className={styles.bankOption}>
+                <img src={bank.bank_icon} alt={bank.bank_name} className={styles.bankIcon} />
+                {bank.bank_name}
+            </div>
+        ),
+    }));
+
+    const currencyOptions = currencies.map(currency => ({
+        value: currency.currency_code,
+        label: (
+            <div className={styles.currencyOption}>
+                <img src={currency.currency_icon} alt={currency.currency_code} className={styles.currencyIcon} />
+                {currency.currency_code} - {currency.currency_country}
+            </div>
+        ),
+    }));
+
     const handleWithdraw = () => {
-        if (loading) return;  // Prevent multiple clicks if already loading
+        if (loading) return;
 
         setSubmitted(true);
-        setLoading(true);  // Set loading to true
+        setLoading(true);
 
         const parsedAmount = parseFloat(amount);
 
         if (isNaN(parsedAmount) || parsedAmount <= 0) {
-            setError('Please enter a valid amount greater than zero.');
-            setLoading(false);  // Reset loading state
+            setAlertMessage('Please enter a valid amount greater than zero.');
+            setLoading(false);
+            return;
+        }
+
+        if (!selectedBank) {
+            setAlertMessage('Please select a bank account.');
+            setLoading(false);
+            return;
+        }
+
+        if (!selectedCurrency) {
+            setAlertMessage('Please select a currency.');
+            setLoading(false);
             return;
         }
 
         if (!walletDetails) {
-            setError('Wallet details are not loaded.');
-            setLoading(false);  // Reset loading state
+            setAlertMessage('Wallet details are not loaded.');
+            setLoading(false);
             return;
         }
 
-        if (parsedAmount > balances[selectedCurrency]) {
-            setError('Insufficient balance.');
-            setLoading(false);  // Reset loading state
+        if (parsedAmount > balances[selectedCurrency.value]) {
+            setAlertMessage('Insufficient balance.');
+            setLoading(false);
             return;
         }
 
-        const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) - parsedAmount;
-
-        axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
-            ...walletDetails,
-            fiat_wallet_balance: newBalance,
-        })
-        .then(response => {
-            setBalances(prevBalances => ({
-                ...prevBalances,
-                [selectedCurrency]: prevBalances[selectedCurrency] - parsedAmount
-            }));
-            setAmount('');
-            setError('');
-            setSubmitted(false);
-            alert('Withdrawn successfully!');
-        })
-        .catch(error => {
-            setError('An error occurred while withdrawing the amount.');
-            console.error('Error withdrawing amount:', error);
-        })
-        .finally(() => {
-            setLoading(false);  // Reset loading state
-        });
+        setPendingAmount(parsedAmount);
+        setAlertMessage('Withdrawn successfully!');
+        setLoading(false);
     };
 
-    const currencyOptions = currencies.map(currency => ({
-        value: currency.currency_code,
-        label: `${currency.currency_code} - ${currency.currency_country}`,
-        icon: currency.currency_icon
-    }));
+    const handleCloseAlert = () => {
+        if (pendingAmount !== null) {
+            const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) - pendingAmount;
+
+            axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
+                ...walletDetails,
+                fiat_wallet_balance: newBalance,
+            })
+            .then(response => {
+                setBalances(prevBalances => ({
+                    ...prevBalances,
+                    [selectedCurrency.value]: prevBalances[selectedCurrency.value] - pendingAmount
+                }));
+                setAmount('');
+                setError('');
+                setSubmitted(false);
+                setPendingAmount(null);
+            })
+            .catch(error => {
+                setError('An error occurred while withdrawing the amount.');
+                console.error('Error withdrawing amount:', error);
+            });
+        }
+        setAlertMessage('');
+    };
 
     return (
         <div className={styles.container}>
+            {alertMessage && (
+                <div className={styles.customAlert}>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
             <div className={styles.topBar}>
                 <button className={styles.topBarButton}>
                     <FaArrowLeft className={styles.topBarIcon} />
                 </button>
                 <h2 className={styles.topBarTitle}>Withdraw</h2>
             </div>
+
             <div className={styles.cardContainer}>
-                {Object.keys(balances).map(currencyCode => (
-                    <div key={currencyCode} className={styles.balanceCard}>
+                <div className={styles.balanceCard}>
+                    <div className={styles.currencyInfo}>
+                        <img
+                            src={currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_icon || ''}
+                            alt={selectedCurrency.value}
+                            className={styles.currencyIconInCard}
+                        />
                         <h3 className={styles.currency}>
-                            {currencyCode} <span className={styles.country}>
-                                {currencies.find(currency => currency.currency_code === currencyCode)?.currency_country || ''}
+                            {selectedCurrency.value} 
+                            <span className={styles.country}>
+                                {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
                             </span>
                         </h3>
-                        <p className={styles.balanceLabel}>Balance:</p>
-                        <p className={styles.balanceAmount}>
-                            {currencyCode === 'INR' ? '₹' : '$'} {balances[currencyCode].toFixed(2)}
-                        </p>
                     </div>
-                ))}
+                    <p className={styles.balanceLabel}>Balance:</p>
+                    <p className={styles.balanceAmount}>
+                        {selectedCurrency.value === 'INR' ? '₹' : '$'} {balances[selectedCurrency.value].toFixed(2)}
+                    </p>
+                </div>
             </div>
+
+
             <div className={styles.form}>
+                <label className={styles.label}>Choose Currency:</label>
+                <Select
+                    options={currencyOptions}
+                    value={selectedCurrency}
+                    onChange={handleCurrencyChange}
+                    className={styles.select}
+                />
                 <label className={styles.label}>Enter Amount:</label>
                 <input
                     type="text"
@@ -157,27 +226,18 @@ const WithdrawForm = () => {
                 {submitted && error && <p className={styles.error}>{error}</p>}
 
                 <label className={styles.label}>Choose Bank Account:</label>
-                <select
+                <Select
+                    options={bankOptions}
+                    value={selectedBank}
+                    onChange={handleBankChange}
                     className={styles.select}
-                    value={selectedCurrency}
-                    onChange={(e) => setSelectedCurrency(e.target.value)}
-                >
-                    <option value="ICICI">ICICI</option>
-                    <option value="BOB">BOB</option>
-                </select>
-
-                <label className={styles.label}>Choose Currency:</label>
-                <CustomDropdown
-                    options={currencyOptions}
-                    value={selectedCurrency}
-                    onChange={handleCurrencyChange}
                 />
 
                 <button
                     type="button"
                     className={styles.submitButton}
                     onClick={handleWithdraw}
-                    disabled={loading}  // Disable button when loading
+                    disabled={loading}
                 >
                     {loading ? 'Processing...' : 'WITHDRAW'}
                 </button>
