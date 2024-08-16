@@ -1,0 +1,52 @@
+.paymentOptionsContainer {
+    background-color: #121212;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    height: 550px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.header {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.paymentOptions {
+    max-height: 470px; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scroll */
+    scrollbar-width: none; /* For Firefox */
+}
+
+.paymentOptions::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+.paymentOptions :hover{
+    background-color: gray;
+
+}
+
+.paymentOption {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid hsl(0, 1%, 28%); /* Add border for better visibility */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 10px;
+    background-color: black; /* Background color */
+}
+
+.paymentOption i {
+    margin-right: 10px; /* Space between icon and text */
+    font-size: 20px; /* Adjust icon size */
+    color: white; /* Icon color */
+}
+
+.paymentOption span {
+    color: white; /* Text color */
+    font-size: 16px; /* Adjust text size */
+}

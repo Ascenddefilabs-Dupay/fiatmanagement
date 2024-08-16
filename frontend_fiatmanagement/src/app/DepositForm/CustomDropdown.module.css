@@ -1,0 +1,58 @@
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    
+}
+
+.dropdownButton {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative; /* Add relative positioning for the arrow */
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.dropdownArrow {
+    margin-left: auto;
+    margin-right: -5px;
+    font-size: 10px;
+}
+
+.dropdownMenu {
+    display: block;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 1;
+    width: 100%;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    
+}
+
+.dropdownItem {
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.dropdownItem:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdownIcon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}

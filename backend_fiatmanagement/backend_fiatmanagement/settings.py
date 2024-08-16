@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'currency_converter',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 
@@ -58,7 +63,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend_fiatmanagement.urls'
 
@@ -83,8 +88,26 @@ WSGI_APPLICATION = 'backend_fiatmanagement.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#data
+DATABASES = {
+    'default': {
+        'ENGINE': 'django_cockroachdb',
+        'NAME': 'wallet',
+        'USER': 'vikram',
+        'PASSWORD': 'ttJguK_ziqY_wiitOorAyA',
+        'HOST': 'jasper-warthog-5516.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'PORT': '26257',
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
+    }
+}
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dhyuqscdu',
+    'API_KEY': '729466293685987',
+    'API_SECRET': 'GnYO_kYGxabPOJBicGUvCnOGrWc'
+}
 
-
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 

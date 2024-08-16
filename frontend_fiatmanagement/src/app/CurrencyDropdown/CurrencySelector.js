@@ -14,7 +14,7 @@ const CurrencySelector = () => {
 
   const handleCurrencySelect = (currency) => {
     setSelectedCurrency(currency);
-    router.push(`/Country_Conversion?currency=${currency}`);
+    router.push(`/Currency_Conversion?currency=${currency}`);
   };
 
   const filteredCurrencies = Object.entries(country_list).filter(([currency]) =>
@@ -37,7 +37,18 @@ const CurrencySelector = () => {
             key={currency}
             className={`${styles.currencyItem} ${selectedCurrency === currency ? styles.selected : ''}`}
             onClick={() => handleCurrencySelect(currency)}
+            style={{ display: 'flex', alignItems: 'center' }} // Align items in the center
           >
+            <img
+              src={`https://flagcdn.com/48x36/${country_list[currency].toLowerCase()}.png`}
+              alt="flag"
+              style={{
+                width: '24px', // Adjust width
+                height: '18px', // Adjust height
+                marginRight: '235px', // Adjust margin
+                objectFit: 'contain' // Keep aspect ratio intact
+              }}
+            />
             {currency}
           </div>
         ))}
