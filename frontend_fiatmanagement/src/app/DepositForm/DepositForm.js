@@ -139,6 +139,29 @@ const DepositForm = () => {
         setLoading(false);
     };
 
+    const customSelectStyles = {
+        control: (base) => ({
+            ...base,
+            backgroundColor: '#2a2a2a',  // Change background 
+            borderColor: '#555',       //  Change border color
+            color: 'white',            //  Change text color inside the dropdown
+        }),
+        menu: (base) => ({
+            ...base,
+            backgroundColor: '#2a2a2a',   // Change dropdown menu background color to gray
+        }),
+        singleValue: (base) => ({
+            ...base,
+            color: 'white',            //Change selected value text color
+        }),
+        option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isFocused ? '#777' : '#2a2a2a', 
+            color: 'white',            //Change option text color
+        }),
+    };
+    
+
     const handleCloseAlert = () => {
         // Update the balance after the alert is closed
         if (pendingAmount !== null) {
@@ -199,6 +222,7 @@ const DepositForm = () => {
                     value={selectedCurrency}
                     onChange={handleCurrencyChange}
                     className={styles.select}
+                    styles={customSelectStyles}
                 />
                 <label className={styles.label}>Enter Amount:</label>
                 <input
@@ -215,6 +239,7 @@ const DepositForm = () => {
                     value={selectedBank}
                     onChange={handleBankChange}
                     className={styles.select}
+                    styles={customSelectStyles}
                 />
 
                 <button

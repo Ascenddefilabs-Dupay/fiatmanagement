@@ -28,51 +28,55 @@
   .cardContainer {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-    margin-left: 3px;
+    margin: 0 0 20px 3px;
+    min-height: 17%;
   }
   
+  /* Balance Card */
   .balanceCard {
-    width: auto; /* Adjusted width to fit two cards side by side */
-    min-width: 48%;
-    /* padding: 20px; */
+     /* Adjusted width to fit two cards side by side */
+    min-width: 50%;
+    width: auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-  }
-  .input {
-    padding: 8px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    font-size: 16px;
     background-color: #2a2a2a;
-    color: white; /* Text color inside the input field */
+    
   }
   
+  /* Currency and Country Text */
   .currency {
     margin: 0;
-    font-size: 20px;
+    font-size: 16px;
+    color: white;
+    margin-top: 10px;
+    
   }
   
   .country {
     font-size: 12px;
-    color: #888;
+    color: white;
+    margin-top: 10px;
+    margin-left: 10%;
+    
   }
   
+  /* Balance Label and Amount */
   .balanceLabel {
-    margin: 10px 0 0 0;
+    margin: 10px 0 0;
     font-size: 14px;
-    color: black;
+    color: white;
   }
   
   .balanceAmount {
-    margin: 5px 0 0 0;
+    margin: 5px 0 0;
     font-size: 24px;
     font-weight: bold;
+    color: white;
   }
   
+  /* Form Styling */
   .form {
     display: flex;
     flex-direction: column;
@@ -84,7 +88,8 @@
     border: 1px solid #555;
     border-radius: 4px;
     font-size: 16px;
-    background-color:  #2a2a2a;
+    background-color: #2a2a2a;
+    color: white; /* Text color inside the input field */
   }
   .label{
     color: white;
@@ -223,8 +228,9 @@
 }
 
 .currencyIconInCard {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  margin-left: 20px;
+  width: 16px;
+  height: 16px;
+  margin: 0 8px 0 20px;
+  margin-left: 30px;
+  margin-top: 10px;
 }
