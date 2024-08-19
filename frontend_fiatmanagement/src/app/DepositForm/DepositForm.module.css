@@ -1,25 +1,24 @@
+/* General Container */
 .container {
   padding: 30px;
   border-radius: 8px;
   height: 550px;
   width: 320px;
-  margin: 0 auto;
-  margin-top: 70px;
+  margin: 70px auto 0; /* Combined margin properties */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   background: black;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+/* Header Styling */
 .header {
   text-align: center;
-  margin-bottom: 0px;
-  margin-top: 0;
+  margin: 0;
   font-size: 24px;
   color: white;
 }
 
-
-
+/* Heading */
 .heading {
   flex-grow: 1;
   text-align: center;
@@ -27,54 +26,59 @@
   font-size: 24px;
 }
 
+/* Card Container */
 .cardContainer {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
-  margin-left: 3px;
+  margin: 0 0 20px 3px;
+  min-height: 17%;
 }
 
+/* Balance Card */
 .balanceCard {
-  width: auto; /* Adjusted width to fit two cards side by side */
-  min-width: 48%;
-  /* padding: 20px; */
+   /* Adjusted width to fit two cards side by side */
+  min-width: 50%;
+  width: auto;
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-}
-.input {
-  padding: 8px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  font-size: 16px;
   background-color: #2a2a2a;
-  color: white; /* Text color inside the input field */
+  
 }
 
+/* Currency and Country Text */
 .currency {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
+  color: white;
+  margin-top: 10px;
+  
 }
 
 .country {
   font-size: 12px;
-  color: #888;
+  color: white;
+  margin-top: 10px;
+  margin-left: 10%;
+  
 }
 
+/* Balance Label and Amount */
 .balanceLabel {
-  margin: 10px 0 0 0;
+  margin: 10px 0 0;
   font-size: 14px;
-  color: black;
+  color: white;
 }
 
 .balanceAmount {
-  margin: 5px 0 0 0;
+  margin: 5px 0 0;
   font-size: 24px;
   font-weight: bold;
+  color: white;
 }
 
+/* Form Styling */
 .form {
   display: flex;
   flex-direction: column;
@@ -86,24 +90,23 @@
   border: 1px solid #555;
   border-radius: 4px;
   font-size: 16px;
-  
+  background-color: #2a2a2a;
+  color: white; /* Text color inside the input field */
 }
-.label{
+
+.label {
   color: white;
 }
 
+/* Select Dropdown Styling */
 .select {
-  
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    
-
-    
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
-  
 
+/* Submit Button */
 .submitButton {
   padding: 10px;
   border: none;
@@ -113,53 +116,20 @@
   font-size: 16px;
   cursor: pointer;
 }
+
+/* Error Text */
 .error {
   color: red;
   font-size: 14px;
-  margin-top: 3px;
-  margin-bottom: 5px;
+  margin: 3px 0 5px;
 }
+
+/* Top Bar */
 .topBar {
   display: flex;
   align-items: center;
   gap: 20px; /* Add spacing between icon and title if needed */
   margin-bottom: 30px;
-
-}
-
-.topBarButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.topBarIcon {
-  font-size: 18px; /* Adjust size if needed */
-  color: white;
-}
-
-.topBarTitle {
-  font-size: 24px;
-  color: white;
-  
-}
-.currencySelectContainer {
-  display: flex;
-  align-items: center;
-}
-
-.currencyIcon {
-  width: 20px;
-  height: 20px;
-  margin-left: 8px;
-}
-.topBar {
-  display: flex;
-  align-items: center;
-  gap: 20px; /* Add spacing between icon and title if needed */
-  margin-bottom: 30px; /* Decrease the bottom margin to move up */
   margin-top: 1px; /* Adjust this value to move up */
 }
 
@@ -171,7 +141,8 @@
 }
 
 .topBarIcon {
-  margin-top: 5px;
+  margin-top: 1px;
+  margin-bottom: 15px;
   font-size: 18px; /* Adjust size if needed */
   color: white;
 }
@@ -181,6 +152,8 @@
   color: white;
   margin-top: 0; /* Remove or adjust this if needed */
 }
+
+/* Custom Alert */
 .customAlert {
   position: fixed;
   top: 20%;
@@ -197,8 +170,7 @@
 }
 
 .customAlert p {
-  margin: 0;
-  margin-bottom: 15px;
+  margin: 0 0 15px;
 }
 
 .closeButton {
@@ -210,18 +182,20 @@
   color: black;
   font-weight: bold;
 }
+
+/* Bank Option Styling */
 .bankOption {
   display: flex;
   align-items: center;
-  background-color:  #2a2a2a;
 }
 
 .bankIcon {
   width: 20px;
   height: 20px;
-  margin-right: 8px;
-  margin-left: 1px;
+  margin: 0 8px 0 1px;
 }
+
+/* Currency Option Styling */
 .currencyOption {
   display: flex;
   align-items: center;
@@ -230,18 +204,20 @@
 .currencyIcon {
   width: 20px;
   height: 20px;
-  margin-left: 1px;
-  margin-right: 8px;
-
+  margin: 0 8px 0 1px;
 }
+
+/* Currency Info in Card */
 .currencyInfo {
   display: flex;
   align-items: center;
 }
 
 .currencyIconInCard {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  margin-left: 20px;
+  width: 16px;
+  height: 16px;
+  margin: 0 8px 0 20px;
+  margin-left: 25px;
+  margin-top: 10px;
 }
+
