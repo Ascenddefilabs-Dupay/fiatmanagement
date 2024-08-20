@@ -45,18 +45,18 @@ export default function FiatWalletForm() {
 
     try {
       // Fetch the user ID by username
-      console.log("0");
+      
       const userResponse = await axios.get(`http://localhost:8000/api/user/`);
-      console.log("1");
+      
 
       if (userResponse.data.length === 0) {
         setError({ form: 'Username does not exist.' });
         return;
       }
-      console.log("2");
+      
 
       const userId = userResponse.data[0].id; // Get the user ID from the response
-      console.log("3");
+      
 
       // Now create the fiat wallet with the correct user ID
       const response = await axios.post('http://localhost:8000/api/fiat_wallets/', {
@@ -65,7 +65,6 @@ export default function FiatWalletForm() {
         fiat_wallet_username: username, // Send the user ID instead of username
         fiat_wallet_phone_number: phoneNumber,
       });
-      console.log("4");
 
       setSuccess('Wallet created successfully!');
       alert('Wallet created successfully!');
