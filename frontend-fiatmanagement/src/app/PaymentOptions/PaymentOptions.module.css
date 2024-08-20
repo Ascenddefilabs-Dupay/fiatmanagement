@@ -5,13 +5,17 @@
     border-radius: 8px;
     width: 320px;
     height: 550px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .header {
     font-size: 24px;
     margin-bottom: 20px;
     color: #fff;
+}
+.paymentIcon {
+    width: 24px;  /* Adjust the size as needed */
+    height: 24px;
+    margin-right: 8px;
 }
 
 .paymentOptions {

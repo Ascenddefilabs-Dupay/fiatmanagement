@@ -7,7 +7,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { FaArrowLeft, FaEllipsisV, FaChevronRight } from 'react-icons/fa';
-import networkOptions from '../NetworkPage/NetworkOptions'
+import networkOptions from '../NetworkPage/NetworkOptions';
 
 const CurrencyConverter = () => {
     const router = useRouter();
@@ -78,6 +78,50 @@ const CurrencyConverter = () => {
         fetchConversionRates();
     }, [amount, fromCurrency, toCurrency]);
 
+    useEffect(() => {
+        // Load Razorpay script
+        const script = document.createElement('script');
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Cleanup the script when component unmounts
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+    const initiateRazorpayPayment = () => {
+        if (window.Razorpay) {
+            const options = {
+                key: 'rzp_test_41ch2lqayiGZ9X', // Your Razorpay API Key
+                amount: parseFloat(amount) * 100, // Amount in paisa
+                currency: 'INR',
+                name: 'DUPAY',
+                description: 'Payment for currency conversion',
+                handler: function (response) {
+                    alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+                    // Handle payment success
+                },
+                prefill: {
+                    name: 'User Name',
+                    email: 'user@example.com',
+                    contact: '9999999999',
+                },
+                notes: {
+                    address: 'Your Address',
+                },
+                theme: {
+                    color: '#F37254',
+                },
+            };
+
+            const rzp1 = new window.Razorpay(options);
+            rzp1.open();
+        } else {
+            alert("Razorpay script not loaded.");
+        }
+    };
+
     const handleContinue = () => {
         router.push('/Currenciespage');
     };
@@ -132,10 +176,11 @@ const CurrencyConverter = () => {
 
         setAmount(value);
     };
-    
+
     const navigateToBuy = () => {
         router.push('/BuyPage');
     };
+
     const togglePaymentOptions = () => {
         setShowPaymentOptions(!showPaymentOptions);
     };
@@ -198,7 +243,7 @@ const CurrencyConverter = () => {
                     <img src="/images/network.jpeg" alt="Network" className="icon" />
                     <span className="smallText">Network:</span>
                     <span className="networkDisplay">{network}</span>
-                    <FaChevronRight className="arrow"></FaChevronRight> 
+                    <FaChevronRight className="arrow" /> 
                 </button>
 
 
@@ -210,18 +255,18 @@ const CurrencyConverter = () => {
                             <div className="buyContainer">
                                 <span className="buyText">Buy</span>
                                 <FaChevronRight className="buyIcon" />
-                                <div class="spacer"></div>
+                                <div className="spacer"></div>
                                 <span className="currencyText">{fromCurrency}</span>
                             </div>
                         </div>
                     </div>
-                    <div className="separator"></div> {/* Vertical line */}
+                    <div className="separator"></div>
                     <div className="paymentRow" onClick={navigateToPaymentOptions}>
                         <img src="/images/paywith.png" alt="Pay with" className="icon" />
                         <div className="textContainer">
                             <span className='pay'>Pay with</span>
                             <FaChevronRight className="buyIcon2" />
-                            <div class="spacer"></div>
+                            <div className="spacer"></div>
                             <div className='credit'>{credit}</div>
                         </div>
                     </div>
@@ -241,10 +286,8 @@ const CurrencyConverter = () => {
                 ))}
             </div>
             
-            <button className="continueButton" onClick={handleContinue}>
-                Continue
-            </button>
-
+            <button className="continueButton" onClick={initiateRazorpayPayment}>Pay Now</button>
+           
             {showBottomSheet && (
                 <div className="bottomSheet">
                     <div className="bottomSheetHeader1">
@@ -264,3 +307,4 @@ const CurrencyConverter = () => {
 };
 
 export default CurrencyConverter;
+ 
