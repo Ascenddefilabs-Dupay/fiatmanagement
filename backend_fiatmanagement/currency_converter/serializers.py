@@ -3,6 +3,7 @@ from .models import Project
 from .models import Bank
 from .models import FiatWallet,User
 from .models import Currency
+from .models import UsersCurrencies
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,7 +22,10 @@ class BankSerializer(serializers.ModelSerializer):
 
 
 
-
+class UsersCurrenciesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsersCurrencies
+        fields = '__all__'
 
 
 

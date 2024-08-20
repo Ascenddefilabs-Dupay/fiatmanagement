@@ -8,10 +8,10 @@ const DepositForm = () => {
     const [balances, setBalances] = useState({
         INR: 0.00,
         USD: 0.00,
-        GBP: 0.00, // Added GBP
-        EUR: 0.00, // Added EUR
-        AUD: 0.00, // Added AUD
-        CAD: 0.00, // Added CAD
+        GBP: 0.00, 
+        EUR: 0.00, 
+        AUD: 0.00, 
+        CAD: 0.00, 
     });
     const [amount, setAmount] = useState('');
     const [selectedCurrency, setSelectedCurrency] = useState({ value: 'INR', label: 'INR' });
@@ -23,7 +23,7 @@ const DepositForm = () => {
     const [walletDetails, setWalletDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const [pendingAmount, setPendingAmount] = useState(null); // New state to store pending amount
+    const [pendingAmount, setPendingAmount] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
@@ -133,46 +133,59 @@ const DepositForm = () => {
             return;
         }
 
-        // Set the pending amount to be added later after OK is clicked
         setPendingAmount(parsedAmount);
         setAlertMessage('Amount deposited successfully!');
+        
+
         setLoading(false);
+
     };
 
     const customSelectStyles = {
         control: (base) => ({
             ...base,
-            backgroundColor: '#2a2a2a',  // Change background 
-            borderColor: '#555',       //  Change border color
-            color: 'white',            //  Change text color inside the dropdown
+            backgroundColor: '#2a2a2a',
+            borderColor: '#555',
+            color: 'white',
         }),
         menu: (base) => ({
             ...base,
-            backgroundColor: '#2a2a2a',   // Change dropdown menu background color to gray
+            backgroundColor: '#2a2a2a',
         }),
         singleValue: (base) => ({
             ...base,
-            color: 'white',            //Change selected value text color
+            color: 'white',
         }),
         option: (base, state) => ({
             ...base,
-            backgroundColor: state.isFocused ? '#777' : '#2a2a2a', 
-            color: 'white',            //Change option text color
+            backgroundColor: state.isFocused ? '#777' : '#2a2a2a',
+            color: 'white',
         }),
     };
-    
 
     const handleCloseAlert = () => {
-        // Update the balance after the alert is closed
         if (pendingAmount !== null) {
-            setBalances(prevBalances => ({
-                ...prevBalances,
-                [selectedCurrency.value]: prevBalances[selectedCurrency.value] + pendingAmount
-            }));
-            setAmount('');
-            setError('');
-            setSubmitted(false);
-            setPendingAmount(null); // Reset pending amount
+            const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) + pendingAmount;
+
+            axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
+                ...walletDetails,
+                fiat_wallet_balance: newBalance,
+            })
+            .then(response => {
+                setBalances(prevBalances => ({
+                    ...prevBalances,
+                    [selectedCurrency.value]: prevBalances[selectedCurrency.value] + pendingAmount
+                }));
+                setAmount('');
+                setError('');
+                setSubmitted(false);
+                setPendingAmount(null);
+                document.location.reload()
+            })
+            .catch(error => {
+                setError('An error occurred while updating the balance.');
+                console.error('Error updating balance:', error);
+            });
         }
         setAlertMessage('');
     };
@@ -201,7 +214,7 @@ const DepositForm = () => {
                             className={styles.currencyIconInCard}
                         />
                         <h3 className={styles.currency}>
-                            {selectedCurrency.value} 
+                            {selectedCurrency.value}
                             <span className={styles.country}>
                                 {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
                             </span>
@@ -213,7 +226,6 @@ const DepositForm = () => {
                     </p>
                 </div>
             </div>
-
 
             <div className={styles.form}>
                 <label className={styles.label}>Choose Currency:</label>

@@ -1,0 +1,70 @@
+.container {
+    height: 550px;
+    width: 320px;
+    background-color: black;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: 70px auto 0; /* Combined margin properties */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+} */
+
+.backArrow {
+    cursor: pointer;
+    color: white;
+    font-size: 24px;
+    margin-bottom: 50px;
+}
+
+.mainTitle {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.amountContainer {
+    margin-bottom: 20px;
+    
+}
+
+
+.label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    
+}
+
+.input {
+    width: 93%;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: white;
+    border: 1px solid #555;
+}
+.select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: white;
+    border: 1px solid #555;
+}
+
+.proceedButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+}

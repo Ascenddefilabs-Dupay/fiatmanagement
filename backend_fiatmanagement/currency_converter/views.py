@@ -9,7 +9,9 @@ from .models import FiatWallet
 from .models import User
 from .models import Currency
 from .serializers import CurrencySerializer
-# Create your views here.
+from .models import UsersCurrencies
+from .serializers import UsersCurrenciesSerializer
+
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -24,6 +26,7 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    # lookup_field="id"
 
 class CurrencyViewSet(viewsets.ModelViewSet):
     queryset = Currency.objects.all()
@@ -31,3 +34,10 @@ class CurrencyViewSet(viewsets.ModelViewSet):
 class BankViewSet(viewsets.ModelViewSet):
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
+
+
+
+class UsersCurrenciesViewSet(viewsets.ModelViewSet):
+    queryset = UsersCurrencies.objects.all()
+    serializer_class = UsersCurrenciesSerializer
+

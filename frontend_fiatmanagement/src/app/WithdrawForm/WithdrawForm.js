@@ -183,6 +183,7 @@ const WithdrawForm = () => {
                 setError('');
                 setSubmitted(false);
                 setPendingAmount(null);
+                document.location.reload()
             })
             .catch(error => {
                 setError('An error occurred while withdrawing the amount.');

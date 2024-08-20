@@ -33,6 +33,11 @@ class User(models.Model):
         null=True,
         unique=True
     )
+    users_data_limit = models.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        default=0,  # Default limit can be 0 or any other appropriate value
+    )
 
     def __str__(self):
         return self.name
@@ -73,6 +78,12 @@ class FiatWallet(models.Model):
         unique=True
     )
     fiat_wallet_username = models.CharField(max_length=50, unique=True)
+    # fiat_wallet_amount_limit = models.DecimalField(
+    #     max_digits=18,
+    #     decimal_places=2,
+    #     default=0,
+    # )
+    # fiat_wallet_limit_type = models.CharField(max_length=10, choices=[('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly')], default='Daily')
 
     def __str__(self):
         return f"{self.user.name} - {self.fiat_wallet_type}"
@@ -110,7 +121,7 @@ class FiatWallet(models.Model):
 
 
 class Currency(models.Model):
-    currency_code = models.CharField(max_length=10, unique=True)
+    currency_code = models.CharField(max_length=10, primary_key=True)
     currency_country = models.CharField(max_length=100,unique=True)
     currency_icon = models.ImageField(upload_to='currency_icons/')
     currency_icon=models.FileField(upload_to='photos',unique=True, blank=True,null=True)
@@ -124,4 +135,14 @@ class Bank(models.Model):
 
     def __str__(self):
         return self.bank_name
+    
+class UsersCurrencies(models.Model):
+    fiat_wallet = models.ForeignKey(FiatWallet, on_delete=models.CASCADE)
+    currency_type = models.ForeignKey(Currency, on_delete=models.CASCADE, to_field='currency_code')
+    balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
+    def __str__(self):
+        return f"{self.fiat_wallet} - {self.currency_type.currency_code} - Balance: {self.balance}"
+
+    class Meta:
+        unique_together = ('fiat_wallet', 'currency_type')
