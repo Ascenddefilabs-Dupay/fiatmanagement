@@ -1,3 +1,18 @@
 psycopg2-binary
 django==5.0.1
 django-cockroachdb==5.0
+psycopg2-binary
+django==5.0.1
+django-cockroachdb==5.0
+"dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "axios": "^1.7.4",
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-icons": "^5.2.1",
+    "react-select": "^5.8.0"
+  },
