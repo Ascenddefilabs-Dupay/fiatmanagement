@@ -1,5 +1,5 @@
 """
-ASGI config for backend_fiatmanagement project.
+ASGI config for backend-fiatmanagement project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_fiatmanagement.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend-fiatmanagement.settings')
 
 application = get_asgi_application()

@@ -1,46 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowLeft } from 'react-icons/fa';
-import axios from 'axios';
 import Select from 'react-select';
+import axios from 'axios';
+import { FaArrowLeft } from 'react-icons/fa';
 import styles from './WithdrawForm.module.css';
 
 const WithdrawForm = () => {
-    const [balances, setBalances] = useState({
-        INR: 0.00,
-        USD: 0.00,
-        GBP: 0.00, 
-        EUR: 0.00, 
-        AUD: 0.00, 
-        CAD: 0.00, 
-    });
+    const [balances, setBalances] = useState({ INR: 0.00, USD: 0.00, GBP: 0.00, EUR: 0.00, AUD: 0.00, CAD: 0.00 });
     const [amount, setAmount] = useState('');
     const [selectedCurrency, setSelectedCurrency] = useState({ value: 'INR', label: 'INR' });
     const [selectedBank, setSelectedBank] = useState(null);
     const [banks, setBanks] = useState([]);
-    const [error, setError] = useState('');
-    const [submitted, setSubmitted] = useState(false);
     const [currencies, setCurrencies] = useState([]);
-    const [walletDetails, setWalletDetails] = useState(null);
+    const [alertMessage, setAlertMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [alertMessage, setAlertMessage] = useState(''); 
     const [pendingAmount, setPendingAmount] = useState(null);
 
     useEffect(() => {
+        // Fetch wallet details
         axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
             .then(response => {
-                setWalletDetails(response.data);
-                setBalances(prevBalances => ({
-                    ...prevBalances,
-                    INR: parseFloat(response.data['fiat_wallet_balance'])
-                }));
+                const { fiat_wallet_balance } = response.data;
+                setBalances(prevBalances => ({ ...prevBalances, INR: parseFloat(fiat_wallet_balance) }));
             })
             .catch(error => console.error('Error fetching wallet details:', error));
 
-        fetch('http://localhost:8000/api/currencies/')
-            .then(response => response.json())
-            .then(data => setCurrencies(data))
+        // Fetch currencies
+        axios.get('http://localhost:8000/api/currencies/')
+            .then(response => setCurrencies(response.data))
             .catch(error => console.error('Error fetching currencies:', error));
 
+        // Fetch banks
         axios.get('http://localhost:8000/api/banks/')
             .then(response => setBanks(response.data))
             .catch(error => console.error('Error fetching banks:', error));
@@ -48,69 +37,23 @@ const WithdrawForm = () => {
 
     const handleAmountChange = (e) => {
         let inputValue = e.target.value;
-        const validInput = /^[0-9]*\.?[0-9]*$/;
-
-        if (!validInput.test(inputValue)) {
-            return;
-        }
-
-        if (inputValue.length > 1 && inputValue.startsWith('0') && inputValue[1] !== '.') {
-            inputValue = inputValue.slice(1);
-        }
-
-        if (inputValue.includes('.')) {
-            const parts = inputValue.split('.');
-            if (parts[1].length > 2) {
-                parts[1] = parts[1].slice(0, 2);
-            }
-            inputValue = parts.join('.');
-        }
-
-        setAmount(inputValue);
-
-        if (submitted) {
-            setError('');
+        if (/^[0-9]*\.?[0-9]*$/.test(inputValue)) {
+            inputValue = inputValue.replace(/^0+/, '') || '0';
+            const [integer, fraction = ''] = inputValue.split('.');
+            setAmount(integer + (fraction ? '.' + fraction.slice(0, 2) : ''));
         }
     };
 
-    const handleCurrencyChange = (option) => {
-        setSelectedCurrency(option);
-    };
-
-    const handleBankChange = (option) => {
-        setSelectedBank(option);
-    };
-
-    const bankOptions = banks.map(bank => ({
-        value: bank.id,
-        label: (
-            <div className={styles.bankOption}>
-                <img src={bank.bank_icon} alt={bank.bank_name} className={styles.bankIcon} />
-                {bank.bank_name}
-            </div>
-        ),
-    }));
-
-    const currencyOptions = currencies.map(currency => ({
-        value: currency.currency_code,
-        label: (
-            <div className={styles.currencyOption}>
-                <img src={currency.currency_icon} alt={currency.currency_code} className={styles.currencyIcon} />
-                {currency.currency_code} - {currency.currency_country}
-            </div>
-        ),
-    }));
+    const handleCurrencyChange = (option) => setSelectedCurrency(option);
+    const handleBankChange = (option) => setSelectedBank(option);
 
     const handleWithdraw = () => {
         if (loading) return;
-
-        setSubmitted(true);
         setLoading(true);
 
         const parsedAmount = parseFloat(amount);
-
-        if (isNaN(parsedAmount) || parsedAmount <= 0) {
-            setAlertMessage('Please enter a valid amount greater than zero.');
+        if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > balances[selectedCurrency.value]) {
+            setAlertMessage('Invalid amount or insufficient balance.');
             setLoading(false);
             return;
         }
@@ -121,76 +64,31 @@ const WithdrawForm = () => {
             return;
         }
 
-        if (!selectedCurrency) {
-            setAlertMessage('Please select a currency.');
-            setLoading(false);
-            return;
-        }
-
-        if (!walletDetails) {
-            setAlertMessage('Wallet details are not loaded.');
-            setLoading(false);
-            return;
-        }
-
-        if (parsedAmount > balances[selectedCurrency.value]) {
-            setAlertMessage('Insufficient balance.');
-            setLoading(false);
-            return;
-        }
-
         setPendingAmount(parsedAmount);
         setAlertMessage('Withdrawn successfully!');
         setLoading(false);
     };
 
-    const customSelectStyles = {
-        control: (base) => ({
-            ...base,
-            backgroundColor: '#2a2a2a',  // Change background 
-            borderColor: '#555',       //  Change border color
-            color: 'white',            //  Change text color inside the dropdown
-        }),
-        menu: (base) => ({
-            ...base,
-            backgroundColor: '#2a2a2a',   // Change dropdown menu background color to gray
-        }),
-        singleValue: (base) => ({
-            ...base,
-            color: 'white',            //Change selected value text color
-        }),
-        option: (base, state) => ({
-            ...base,
-            backgroundColor: state.isFocused ? '#777' : '#2a2a2a', 
-            color: 'white',            //Change option text color
-        }),
-    };
-
     const handleCloseAlert = () => {
         if (pendingAmount !== null) {
-            const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) - pendingAmount;
+            const newBalance = balances[selectedCurrency.value] - pendingAmount;
 
-            axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
-                ...walletDetails,
-                fiat_wallet_balance: newBalance,
-            })
-            .then(response => {
-                setBalances(prevBalances => ({
-                    ...prevBalances,
-                    [selectedCurrency.value]: prevBalances[selectedCurrency.value] - pendingAmount
-                }));
-                setAmount('');
-                setError('');
-                setSubmitted(false);
-                setPendingAmount(null);
-                document.location.reload()
-            })
-            .catch(error => {
-                setError('An error occurred while withdrawing the amount.');
-                console.error('Error withdrawing amount:', error);
-            });
+            axios.put(`http://localhost:8000/api/fiat_wallets/wa0000000001/`, { fiat_wallet_balance: newBalance })
+                .then(() => {
+                    setBalances(prevBalances => ({ ...prevBalances, [selectedCurrency.value]: newBalance }));
+                    setAmount('');
+                    setPendingAmount(null);
+                    setAlertMessage('');
+                })
+                .catch(error => console.error('Error withdrawing amount:', error));
         }
-        setAlertMessage('');
+    };
+
+    const customSelectStyles = {
+        control: (base) => ({ ...base, backgroundColor: '#2a2a2a', borderColor: '#555', color: 'white' }),
+        menu: (base) => ({ ...base, backgroundColor: '#2a2a2a' }),
+        singleValue: (base) => ({ ...base, color: 'white' }),
+        option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? '#777' : '#2a2a2a', color: 'white' }),
     };
 
     return (
@@ -207,7 +105,6 @@ const WithdrawForm = () => {
                 </button>
                 <h2 className={styles.topBarTitle}>Withdraw</h2>
             </div>
-
             <div className={styles.cardContainer}>
                 <div className={styles.balanceCard}>
                     <div className={styles.currencyInfo}>
@@ -229,15 +126,20 @@ const WithdrawForm = () => {
                     </p>
                 </div>
             </div>
-
-
             <div className={styles.form}>
                 <label className={styles.label}>Choose Currency:</label>
                 <Select
-                    options={currencyOptions}
+                    options={currencies.map(currency => ({
+                        value: currency.currency_code,
+                        label: (
+                            <div className={styles.currencyOption}>
+                                <img src={currency.currency_icon} alt={currency.currency_code} className={styles.currencyIcon} />
+                                {currency.currency_code} - {currency.currency_country}
+                            </div>
+                        ),
+                    }))}
                     value={selectedCurrency}
                     onChange={handleCurrencyChange}
-                    className={styles.select}
                     styles={customSelectStyles}
                 />
                 <label className={styles.label}>Enter Amount:</label>
@@ -246,26 +148,24 @@ const WithdrawForm = () => {
                     className={styles.input}
                     value={amount}
                     onChange={handleAmountChange}
-                    
                 />
-                {submitted && error && <p className={styles.error}>{error}</p>}
-
                 <label className={styles.label}>Choose Bank Account:</label>
                 <Select
-                    options={bankOptions}
+                    options={banks.map(bank => ({
+                        value: bank.id,
+                        label: (
+                            <div className={styles.bankOption}>
+                                <img src={bank.bank_icon} alt={bank.bank_name} className={styles.bankIcon} />
+                                {bank.bank_name}
+                            </div>
+                        ),
+                    }))}
                     value={selectedBank}
                     onChange={handleBankChange}
-                    className={styles.select}
                     styles={customSelectStyles}
                 />
-
-                <button
-                    type="button"
-                    className={styles.submitButton}
-                    onClick={handleWithdraw}
-                    disabled={loading}
-                >
-                    {loading ? 'Processing...' : 'WITHDRAW'}
+                <button onClick={handleWithdraw} className={styles.submitButton} disabled={loading}>
+                    Withdraw
                 </button>
             </div>
         </div>

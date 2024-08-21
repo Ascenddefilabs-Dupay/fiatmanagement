@@ -23,17 +23,21 @@ const MyWallet = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        // Fetch wallet details and currencies
-        axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
+        // Fetch wallet details and user currencies
+        axios.get('http://localhost:8000/api/user_currencies/?wallet_id=wa0000000001')
             .then(response => {
-                setWalletDetails(response.data);
+                const userCurrencies = response.data;
+                const updatedBalances = {};
+                userCurrencies.forEach(currency => {
+                    updatedBalances[currency.currency_type] = parseFloat(currency.balance);
+                });
                 setBalances(prevBalances => ({
                     ...prevBalances,
-                    INR: parseFloat(response.data['fiat_wallet_balance'])
+                    ...updatedBalances,
                 }));
             })
-            .catch(error => console.error('Error fetching wallet details:', error));
-
+            .catch(error => console.error('Error fetching user currencies:', error));
+    
         fetch('http://localhost:8000/api/currencies/')
             .then(response => response.json())
             .then(data => {
@@ -47,6 +51,7 @@ const MyWallet = () => {
             })
             .catch(error => console.error('Error fetching currencies:', error));
     }, []);
+    
 
     useEffect(() => {
         // Update image when currency changes
@@ -138,7 +143,7 @@ const MyWallet = () => {
                         <span className={styles.currencyCountry}>{selectedCountry}</span>
                     </div>
                     <div className={styles.balanceAmount}>
-                        ₹ {balances[selectedCurrency.value].toFixed(2)}
+                        ₹ {balances[selectedCurrency.value] ? balances[selectedCurrency.value].toFixed(2) : '0.00'}
                     </div>
                 </div>
             </div>

@@ -136,13 +136,11 @@ class Bank(models.Model):
     def __str__(self):
         return self.bank_name
     
-class UsersCurrencies(models.Model):
-    fiat_wallet = models.ForeignKey(FiatWallet, on_delete=models.CASCADE)
-    currency_type = models.ForeignKey(Currency, on_delete=models.CASCADE, to_field='currency_code')
+class UserCurrency(models.Model):
+    id = models.AutoField(primary_key=True)
+    wallet_id = models.CharField(max_length=255, unique=False)
+    currency_type = models.CharField(max_length=100)
     balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
     def __str__(self):
-        return f"{self.fiat_wallet} - {self.currency_type.currency_code} - Balance: {self.balance}"
-
-    class Meta:
-        unique_together = ('fiat_wallet', 'currency_type')
+        return f"{self.wallet_id} - {self.currency_type} - Balance: {self.balance}"

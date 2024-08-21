@@ -5,14 +5,7 @@ import axios from 'axios';
 import Select from 'react-select';
 
 const DepositForm = () => {
-    const [balances, setBalances] = useState({
-        INR: 0.00,
-        USD: 0.00,
-        GBP: 0.00, 
-        EUR: 0.00, 
-        AUD: 0.00, 
-        CAD: 0.00, 
-    });
+    const [balances, setBalances] = useState({});
     const [amount, setAmount] = useState('');
     const [selectedCurrency, setSelectedCurrency] = useState({ value: 'INR', label: 'INR' });
     const [selectedBank, setSelectedBank] = useState(null);
@@ -29,10 +22,6 @@ const DepositForm = () => {
         axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
             .then(response => {
                 setWalletDetails(response.data);
-                setBalances(prevBalances => ({
-                    ...prevBalances,
-                    INR: parseFloat(response.data['fiat_wallet_balance'])
-                }));
             })
             .catch(error => console.error('Error fetching wallet details:', error));
 
@@ -45,6 +34,20 @@ const DepositForm = () => {
             .then(response => setBanks(response.data))
             .catch(error => console.error('Error fetching banks:', error));
     }, []);
+
+    useEffect(() => {
+        if (walletDetails) {
+            axios.get(`http://localhost:8000/api/user_currencies/?wallet_id=${walletDetails.fiat_wallet_id}`)
+                .then(response => {
+                    const userCurrencies = response.data.reduce((acc, currency) => {
+                        acc[currency.currency_type] = parseFloat(currency.balance);
+                        return acc;
+                    }, {});
+                    setBalances(userCurrencies);
+                })
+                .catch(error => console.error('Error fetching user currencies:', error));
+        }
+    }, [walletDetails, selectedCurrency]);
 
     const bankOptions = banks.map(bank => ({
         value: bank.id,
@@ -100,47 +103,6 @@ const DepositForm = () => {
             setError('');
         }
     };
-
-    const handleDeposit = () => {
-        if (loading) return;
-
-        setSubmitted(true);
-        setLoading(true);
-
-        const parsedAmount = parseFloat(amount);
-
-        if (isNaN(parsedAmount) || parsedAmount <= 0) {
-            setAlertMessage('Please enter a valid amount greater than zero.');
-            setLoading(false);
-            return;
-        }
-
-        if (!selectedBank) {
-            setAlertMessage('Please select a bank account.');
-            setLoading(false);
-            return;
-        }
-
-        if (!selectedCurrency) {
-            setAlertMessage('Please select a currency.');
-            setLoading(false);
-            return;
-        }
-
-        if (!walletDetails) {
-            setAlertMessage('Wallet details are not loaded.');
-            setLoading(false);
-            return;
-        }
-
-        setPendingAmount(parsedAmount);
-        setAlertMessage('Amount deposited successfully!');
-        
-
-        setLoading(false);
-
-    };
-
     const customSelectStyles = {
         control: (base) => ({
             ...base,
@@ -162,24 +124,79 @@ const DepositForm = () => {
             color: 'white',
         }),
     };
-
+    const handleDeposit = () => {
+        setSubmitted(true);
+    
+        const parsedAmount = parseFloat(amount);
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            setError('Please enter a valid amount greater than zero.');
+            return;
+        }
+    
+        if (!walletDetails) {
+            setError('Wallet details not loaded.');
+            return;
+        }
+    
+        setLoading(true);
+    
+        // Prepare data for the API call
+        const depositData = {
+            wallet_id: walletDetails.fiat_wallet_id,
+            currency_type: selectedCurrency.value,
+            amount: parsedAmount,
+        };
+    
+        // Make the API call to update UserCurrency
+        axios.post('http://localhost:8000/api/user_currencies/create_or_update/', depositData)
+            .then(response => {
+                setPendingAmount(parsedAmount);
+    
+                // If currency is INR, store the alert message to update FiatWallet later
+                if (selectedCurrency.value === 'INR') {
+                    setAlertMessage('Deposit successful! Click OK .');
+                    
+                } else {
+                    setAlertMessage('Deposit successful!');
+                    
+                    // Update the user currency balance directly
+                    setBalances(prevBalances => ({
+                        ...prevBalances,
+                        [selectedCurrency.value]: (prevBalances[selectedCurrency.value] || 0) + parsedAmount
+                    }));
+                    setAmount('');
+                    setError('');
+                    setSubmitted(false);
+                    setPendingAmount(null);
+                }
+    
+                setLoading(false);
+            })
+            .catch(error => {
+                setError('An error occurred while processing the deposit.');
+                console.error('Error depositing amount:', error);
+                setLoading(false);
+            });
+    };
+    
     const handleCloseAlert = () => {
-        if (pendingAmount !== null) {
-            const newBalance = parseFloat(walletDetails['fiat_wallet_balance']) + pendingAmount;
-
-            axios.put('http://localhost:8000/api/fiat_wallets/wa0000000001/', {
+        if (pendingAmount !== null && selectedCurrency.value === 'INR') {
+            const newBalance = parseFloat(walletDetails.fiat_wallet_balance) + pendingAmount;
+    
+            axios.put(`http://localhost:8000/api/fiat_wallets/${walletDetails.fiat_wallet_id}/`, {
                 ...walletDetails,
                 fiat_wallet_balance: newBalance,
             })
-            .then(response => {
+            .then(() => {
                 setBalances(prevBalances => ({
                     ...prevBalances,
-                    [selectedCurrency.value]: prevBalances[selectedCurrency.value] + pendingAmount
+                    [selectedCurrency.value]: (prevBalances[selectedCurrency.value] || 0) + pendingAmount
                 }));
                 setAmount('');
                 setError('');
                 setSubmitted(false);
                 setPendingAmount(null);
+                // setAlertMessage('Balance updated successfully.');
                 document.location.reload()
             })
             .catch(error => {
@@ -222,7 +239,7 @@ const DepositForm = () => {
                     </div>
                     <p className={styles.balanceLabel}>Balance:</p>
                     <p className={styles.balanceAmount}>
-                        {selectedCurrency.value === 'INR' ? '₹' : '$'} {balances[selectedCurrency.value].toFixed(2)}
+                        {selectedCurrency.value === 'INR' ? '₹' : '$'} {balances[selectedCurrency.value]?.toFixed(2) || '0.00'}
                     </p>
                 </div>
             </div>
