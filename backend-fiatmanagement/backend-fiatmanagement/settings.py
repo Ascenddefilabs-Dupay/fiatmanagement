@@ -91,16 +91,15 @@ WSGI_APPLICATION = 'backend-fiatmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_cockroachdb',
-        'NAME': 'dupay_fiat',
-        'USER': 'vikram',
-        'PASSWORD': 'NPMbGzIKMNcMU-M0C_E8PQ',
-        'HOST': 'vikram-5864.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'NAME': 'Dupay',
+        'USER': 'Gtpl',
+        'PASSWORD': 'mu6-f6rSv9t_oCLSh6iFLg',
+        'HOST': 'meteor-dunnart-5620.7s5.aws-ap-south-1.cockroachlabs.cloud',
         'PORT': '26257',
-        'OPTIONS': {
-            'sslmode': 'require',
+        'sslmode': 'disable'
         }
     }
-}
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dhyuqscdu',
     'API_KEY': '729466293685987',

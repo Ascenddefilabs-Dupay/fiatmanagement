@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import styles from './AddBankForm.module.css';
 import { FaArrowLeft } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 export default function AddBankForm() {
   const [bankName, setBankName] = useState('');
   const [bankIcon, setBankIcon] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function AddBankForm() {
 
       if (res.ok) {
         window.alert('Bank added successfully!');
+        router.push ('http://localhost:3003/Dashboard')
         setBankName('');
         setBankIcon(null);
         setStatusMessage('');
@@ -37,12 +40,15 @@ export default function AddBankForm() {
       setStatusMessage('An error occurred.');
     }
   };
+  const handleLeftArrowClick = () => {
+    window.location.href = 'http://localhost:3003/Dashboard';
+};
 
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
         <button className={styles.topBarButton}>
-          <FaArrowLeft className={styles.topBarIcon} />
+          <FaArrowLeft className={styles.topBarIcon} onClick={handleLeftArrowClick}/>
         </button>
         <h2 className={styles.topBarTitle}>Add Bank</h2>
       </div>

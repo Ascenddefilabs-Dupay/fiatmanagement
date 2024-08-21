@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    padding: 80px;
+    /* padding: 80px; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,7 +20,7 @@ body {
     position: relative;
     justify-content: space-between;
     width: 320px; /* Set width to 320px */
-    height: 550px; /* Set height to 600px */
+    height: 540px; /* Set height to 600px */
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     
 }

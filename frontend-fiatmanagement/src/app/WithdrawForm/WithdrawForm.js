@@ -68,6 +68,10 @@ const WithdrawForm = () => {
         setAlertMessage('Withdrawn successfully!');
         setLoading(false);
     };
+    const handleLeftArrowClick = () => {
+        window.location.href = 'http://localhost:3003/Dashboard';
+    };
+    
 
     const handleCloseAlert = () => {
         if (pendingAmount !== null) {
@@ -101,7 +105,7 @@ const WithdrawForm = () => {
             )}
             <div className={styles.topBar}>
                 <button className={styles.topBarButton}>
-                    <FaArrowLeft className={styles.topBarIcon} />
+                    <FaArrowLeft className={styles.topBarIcon} onClick={handleLeftArrowClick}/>
                 </button>
                 <h2 className={styles.topBarTitle}>Withdraw</h2>
             </div>

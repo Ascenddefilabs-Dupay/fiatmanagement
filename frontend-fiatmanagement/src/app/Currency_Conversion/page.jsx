@@ -197,11 +197,15 @@ const CurrencyConverter = () => {
         router.push('/NetworkPage');
     };
 
+    const navigateToDashboard = () => {
+        window.location.href = 'http://localhost:3003/Dashboard';
+    };
     return (
         <div className="converterContainer">
             <div className="topBar">
                 <button className="topBarButton">
-                    <FaArrowLeft className="topBarIcon" />
+                    <FaArrowLeft className="topBarIcon" onClick={navigateToDashboard} />
+
                 </button>
                 <div className="topBarTitle1">Buy</div>
                 <button className="topBarButton1" onClick={toggleBottomSheet}>

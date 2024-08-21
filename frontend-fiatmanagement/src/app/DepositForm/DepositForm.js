@@ -178,6 +178,9 @@ const DepositForm = () => {
                 setLoading(false);
             });
     };
+    const handleLeftArrowClick = () => {
+        window.location.href = 'http://localhost:3003/Dashboard';
+    };
     
     const handleCloseAlert = () => {
         if (pendingAmount !== null && selectedCurrency.value === 'INR') {
@@ -206,6 +209,7 @@ const DepositForm = () => {
         }
         setAlertMessage('');
     };
+    
 
     return (
         <div className={styles.container}>
@@ -217,7 +221,7 @@ const DepositForm = () => {
             )}
             <div className={styles.topBar}>
                 <button className={styles.topBarButton}>
-                    <FaArrowLeft className={styles.topBarIcon} />
+                    <FaArrowLeft className={styles.topBarIcon} onClick={handleLeftArrowClick} />
                 </button>
                 <h2 className={styles.topBarTitle}>Deposit</h2>
             </div>

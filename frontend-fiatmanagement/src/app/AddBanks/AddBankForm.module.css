@@ -1,5 +1,5 @@
 .container {
-    height: 550px;
+    height: 540px;
     width: 320px;
     
     color: white;
@@ -7,7 +7,7 @@
     box-sizing: border-box;
     border-radius: 8px;
     margin: 0 auto;
-    margin-top: 70px;  
+    /* margin-top: 70px;   */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     background: black;
     
@@ -74,13 +74,15 @@
   
   .submitButton {
     padding: 10px;
-    background-color: #007bff;
+    background: linear-gradient(90deg, #007bff9f, #800080);
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 15px;
+    margin-left: 1px;
+    margin-right: -20px;
     margin-top: 20px;
+    
   }
   
   .submitButton:hover {
@@ -97,6 +99,7 @@
     align-items: center;
     gap: 20px; /* Add spacing between icon and title if needed */
     margin-bottom: 30px;
+    margin-top: -20px;
 
   }
   
