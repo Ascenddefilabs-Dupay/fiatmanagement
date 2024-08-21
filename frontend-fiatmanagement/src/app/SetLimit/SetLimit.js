@@ -9,58 +9,106 @@ const SetLimit = () => {
     const [amount, setAmount] = useState('');
     const [walletDetails, setWalletDetails] = useState(null);
     const [limitType, setLimitType] = useState('Daily');
+    const [alertMessage, setAlertMessage] = useState(''); // State for alert message
+    const [error, setError] = useState(''); // State for error message
+    const [submitted, setSubmitted] = useState(false); // State for submission tracking
 
     const handleBackClick = () => {
         router.back(); // Go back to the previous page
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/user/a9e1fa8c-e2c3-47b6-8038-a207570135a7/')
+        axios.get('http://localhost:8000/api/user/5eaad320-560b-45b1-8b87-d6eb1dced6fe/')
             .then(response => {
                 setWalletDetails(response.data);
             })
-            .catch(error => window.alert('Error fetching wallet details:', error));
+            .catch(error => setAlertMessage('Error fetching wallet details'));
     }, []);
 
+    const handleAmountChange = (e) => {
+        let inputValue = e.target.value;
+        const validInput = /^[0-9]*\.?[0-9]*$/;
+
+        if (!validInput.test(inputValue)) {
+            return;
+        }
+
+        if (inputValue.length > 1 && inputValue.startsWith('0') && inputValue[1] !== '.') {
+            inputValue = inputValue.slice(1);
+        }
+
+        if (inputValue.includes('.')) {
+            const parts = inputValue.split('.');
+            if (parts[1].length > 2) {
+                parts[1] = parts[1].slice(0, 2);
+            }
+            inputValue = parts.join('.');
+        }
+
+        setAmount(inputValue);
+
+        if (submitted) {
+            setError('');
+        }
+    };
+
     const handleProceedClick = async () => {
+        setSubmitted(true);
+        const parsedAmount = parseFloat(amount);
+
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            setError('Please enter a valid amount greater than zero.');
+            return;
+        }
+
         if (walletDetails) {
             try {
-                const newBalance = parseFloat(amount);
-                
-                const response = await axios.put('http://localhost:8000/api/user/a9e1fa8c-e2c3-47b6-8038-a207570135a7/', {
+                const response = await axios.put('http://localhost:8000/api/user/5eaad320-560b-45b1-8b87-d6eb1dced6fe/', {
                     ...walletDetails,
-                    users_data_limit: newBalance,
-                    limit_type: limitType // Add this if you want to include the limitType in the update
+                    users_data_limit: parsedAmount,
+                    limit_type: limitType
                 });
 
                 if (response.status === 200) {
-                    window.alert('Limit updated successfully');
-                    setAmount("")
+                    setAlertMessage('Limit updated successfully');
+                    setAmount('');
+                    setError(''); // Clear the error if successful
                 } else {
-                    window.alert('Failed to update limit');
+                    setAlertMessage('Failed to update limit');
                 }
             } catch (error) {
-                window.alert('Error:', error);
+                setAlertMessage('Error updating limit');
             }
         } else {
-            window.alert('Wallet details not loaded');
+            setAlertMessage('Wallet details not loaded');
         }
+    };
+
+    const handleCloseAlert = () => {
+        setAlertMessage('');
     };
 
     return (
         <div className={styles.container}>
+            {alertMessage && (
+                <div className={styles.customAlert}>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
             <div className={styles.header}>
                 <FaArrowLeft className={styles.backArrow} onClick={handleBackClick} /> {/* Back arrow button */}
             </div>
             <div className={styles.amountContainer}>
                 <label className={styles.label}>Enter Amount:</label>
                 <input
-                    type="number"
+                    type="text"
                     placeholder="Enter the amount"
                     className={styles.input}
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={handleAmountChange}
                 />
+                {submitted && error && <p className={styles.error}>{error}</p>} {/* Error message */}
             </div>
             <label className={styles.label}>Limit Type:</label>
             <select

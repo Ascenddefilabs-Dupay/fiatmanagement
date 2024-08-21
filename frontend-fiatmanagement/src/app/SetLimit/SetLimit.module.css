@@ -68,3 +68,36 @@
     margin-top: 20px;
     cursor: pointer;
 }
+.customAlert {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: gray;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 15%;
+    max-width: 320px;
+    text-align: center;
+  }
+  
+  .customAlert p {
+    margin: 0 0 15px;
+  }
+  
+  .closeButton {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+  }
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
