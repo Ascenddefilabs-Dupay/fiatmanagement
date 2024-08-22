@@ -25,7 +25,7 @@ export default function AddBankForm() {
 
       if (res.ok) {
         window.alert('Bank added successfully!');
-        router.push ('http://localhost:3003/Dashboard')
+        router.push ('http://localhost:3003/Crypto_Wallet/Dashboard')
         setBankName('');
         setBankIcon(null);
         setStatusMessage('');
@@ -41,7 +41,7 @@ export default function AddBankForm() {
     }
   };
   const handleLeftArrowClick = () => {
-    window.location.href = 'http://localhost:3003/Dashboard';
+    window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
 };
 
   return (

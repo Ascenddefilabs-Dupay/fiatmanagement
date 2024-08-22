@@ -69,7 +69,7 @@ const WithdrawForm = () => {
         setLoading(false);
     };
     const handleLeftArrowClick = () => {
-        window.location.href = 'http://localhost:3003/Dashboard';
+        window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
     };
     
 
