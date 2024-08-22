@@ -9,6 +9,7 @@ export default function FiatWalletForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState({});
   const [success, setSuccess] = useState(null);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const validateFields = () => {
     const newError = {};
@@ -67,7 +68,12 @@ export default function FiatWalletForm() {
       });
 
       setSuccess('Wallet created successfully!');
-      alert('Wallet created successfully!');
+      setAlertMessage('Wallet created successfully!');
+      setPhoneNumber('');
+      setUsername('');
+      setWalletCurrency("");
+      setWalletType("");
+      
       console.log('Wallet created:', response.data);
     } catch (error) {
       let errorMessage;
@@ -80,9 +86,17 @@ export default function FiatWalletForm() {
       console.error('Error creating wallet:', error);
     }
   };
-
+  const handleCloseAlert = () => {
+    setAlertMessage('')
+  }
   return (
     <div className={styles.container}>
+      {alertMessage && (
+                <div className={styles.customAlert}>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
       <h1 className={styles.title}>Create Fiat Wallet</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>

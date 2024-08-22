@@ -15,20 +15,37 @@ const WithdrawForm = () => {
     const [loading, setLoading] = useState(false);
     const [pendingAmount, setPendingAmount] = useState(null);
 
+    // Currency symbols mapping
+    const currencySymbols = {
+        INR: '₹',
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        AUD: 'A$',
+        CAD: 'C$',
+        // Add more currencies as needed
+    };
+
     useEffect(() => {
-        // Fetch wallet details
-        axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
+        // Fetch wallet details from UserCurrencies table
+        axios.get(`http://localhost:8000/api/user_currencies/?wallet_id=Wa0000000001`)
             .then(response => {
-                const { fiat_wallet_balance } = response.data;
-                setBalances(prevBalances => ({ ...prevBalances, INR: parseFloat(fiat_wallet_balance) }));
+                const userCurrencies = response.data;
+                const newBalances = {};
+    
+                userCurrencies.forEach(currency => {
+                    newBalances[currency.currency_type] = parseFloat(currency.balance);
+                });
+    
+                setBalances(prevBalances => ({ ...prevBalances, ...newBalances }));
             })
             .catch(error => console.error('Error fetching wallet details:', error));
-
+    
         // Fetch currencies
         axios.get('http://localhost:8000/api/currencies/')
             .then(response => setCurrencies(response.data))
             .catch(error => console.error('Error fetching currencies:', error));
-
+    
         // Fetch banks
         axios.get('http://localhost:8000/api/banks/')
             .then(response => setBanks(response.data))
@@ -50,41 +67,66 @@ const WithdrawForm = () => {
     const handleWithdraw = () => {
         if (loading) return;
         setLoading(true);
-
+    
         const parsedAmount = parseFloat(amount);
-        if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > balances[selectedCurrency.value]) {
-            setAlertMessage('Invalid amount or insufficient balance.');
+    
+        if (!selectedCurrency) {
+            setAlertMessage('Please select a currency.');
             setLoading(false);
             return;
         }
-
+    
+        if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+            setAlertMessage('Please enter a valid amount.');
+            setLoading(false);
+            return;
+        }
+    
+        if (parsedAmount > balances[selectedCurrency.value]) {
+            setAlertMessage('Insufficient balance.');
+            setLoading(false);
+            return;
+        }
+    
         if (!selectedBank) {
             setAlertMessage('Please select a bank account.');
             setLoading(false);
             return;
         }
-
+    
         setPendingAmount(parsedAmount);
         setAlertMessage('Withdrawn successfully!');
         setLoading(false);
     };
+
     const handleLeftArrowClick = () => {
         window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
     };
     
-
     const handleCloseAlert = () => {
         if (pendingAmount !== null) {
-            const newBalance = balances[selectedCurrency.value] - pendingAmount;
-
-            axios.put(`http://localhost:8000/api/fiat_wallets/wa0000000001/`, { fiat_wallet_balance: newBalance })
-                .then(() => {
-                    setBalances(prevBalances => ({ ...prevBalances, [selectedCurrency.value]: newBalance }));
-                    setAmount('');
-                    setPendingAmount(null);
-                    setAlertMessage('');
-                })
-                .catch(error => console.error('Error withdrawing amount:', error));
+            axios.post('http://localhost:8000/api/user_currencies/withdraw/', {
+                wallet_id: 'Wa0000000001',
+                currency_type: selectedCurrency.value,
+                amount: pendingAmount
+            })
+            .then(response => {
+                const { user_currency_balance } = response.data;
+    
+                setBalances(prevBalances => ({
+                    ...prevBalances,
+                    [selectedCurrency.value]: user_currency_balance
+                }));
+                setAmount('');
+                setPendingAmount(null);
+                setAlertMessage('');
+            })
+            .catch(error => {
+                console.error('Error withdrawing amount:', error);
+                setAlertMessage('Failed to withdraw the amount. Please try again.');
+            });
+        } else {
+            setAlertMessage('');
         }
     };
 
@@ -126,8 +168,10 @@ const WithdrawForm = () => {
                     </div>
                     <p className={styles.balanceLabel}>Balance:</p>
                     <p className={styles.balanceAmount}>
-                        {selectedCurrency.value === 'INR' ? '₹' : '$'} {balances[selectedCurrency.value].toFixed(2)}
+                        {currencySymbols[selectedCurrency.value] || ''} 
+                        {balances[selectedCurrency.value] !== undefined ? balances[selectedCurrency.value].toFixed(2) : '0.00'}
                     </p>
+
                 </div>
             </div>
             <div className={styles.form}>

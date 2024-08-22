@@ -18,8 +18,19 @@ const DepositForm = () => {
     const [alertMessage, setAlertMessage] = useState('');
     const [pendingAmount, setPendingAmount] = useState(null);
 
+    // Currency symbols mapping
+    const currencySymbols = {
+        INR: '₹',
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        AUD: 'A$',
+        CAD: 'C$',
+        // Add more currencies as needed
+    };
+
     useEffect(() => {
-        axios.get('http://localhost:8000/api/fiat_wallets/wa0000000001/')
+        axios.get('http://localhost:8000/api/fiat_wallets/Wa0000000001/')
             .then(response => {
                 setWalletDetails(response.data);
             })
@@ -68,6 +79,7 @@ const DepositForm = () => {
             </div>
         ),
     }));
+    
 
     const handleBankChange = (selectedOption) => {
         setSelectedBank(selectedOption);
@@ -103,6 +115,7 @@ const DepositForm = () => {
             setError('');
         }
     };
+
     const customSelectStyles = {
         control: (base) => ({
             ...base,
@@ -124,41 +137,55 @@ const DepositForm = () => {
             color: 'white',
         }),
     };
+
     const handleDeposit = () => {
         setSubmitted(true);
-    
+
         const parsedAmount = parseFloat(amount);
+
+        // Currency Validation
+        if (!selectedCurrency) {
+            setAlertMessage('Please select a currency.');
+            return;
+        }
+
+        // Amount Validation
         if (isNaN(parsedAmount) || parsedAmount <= 0) {
-            setError('Please enter a valid amount greater than zero.');
+            setAlertMessage('Please enter a valid amount greater than zero.');
             return;
         }
-    
+
+        // Bank Validation
+        if (!selectedBank) {
+            setAlertMessage('Please select a bank account.');
+            return;
+        }
+
         if (!walletDetails) {
-            setError('Wallet details not loaded.');
+            setAlertMessage('Wallet details not loaded.');
             return;
         }
-    
+
         setLoading(true);
-    
+
         // Prepare data for the API call
         const depositData = {
             wallet_id: walletDetails.fiat_wallet_id,
             currency_type: selectedCurrency.value,
             amount: parsedAmount,
         };
-    
+
         // Make the API call to update UserCurrency
         axios.post('http://localhost:8000/api/user_currencies/create_or_update/', depositData)
             .then(response => {
                 setPendingAmount(parsedAmount);
-    
+
                 // If currency is INR, store the alert message to update FiatWallet later
                 if (selectedCurrency.value === 'INR') {
                     setAlertMessage('Deposit successful! Click OK .');
-                    
                 } else {
                     setAlertMessage('Deposit successful!');
-                    
+
                     // Update the user currency balance directly
                     setBalances(prevBalances => ({
                         ...prevBalances,
@@ -169,23 +196,27 @@ const DepositForm = () => {
                     setSubmitted(false);
                     setPendingAmount(null);
                 }
-    
+
                 setLoading(false);
             })
             .catch(error => {
-                setError('An error occurred while processing the deposit.');
+                setAlertMessage('An error occurred while processing the deposit.');
                 console.error('Error depositing amount:', error);
                 setLoading(false);
             });
     };
+
     const handleLeftArrowClick = () => {
         window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
     };
     
+
+
+
     const handleCloseAlert = () => {
         if (pendingAmount !== null && selectedCurrency.value === 'INR') {
             const newBalance = parseFloat(walletDetails.fiat_wallet_balance) + pendingAmount;
-    
+
             axios.put(`http://localhost:8000/api/fiat_wallets/${walletDetails.fiat_wallet_id}/`, {
                 ...walletDetails,
                 fiat_wallet_balance: newBalance,
@@ -199,8 +230,7 @@ const DepositForm = () => {
                 setError('');
                 setSubmitted(false);
                 setPendingAmount(null);
-                // setAlertMessage('Balance updated successfully.');
-                document.location.reload()
+                document.location.reload();
             })
             .catch(error => {
                 setError('An error occurred while updating the balance.');
@@ -228,22 +258,25 @@ const DepositForm = () => {
 
             <div className={styles.cardContainer}>
                 <div className={styles.balanceCard}>
-                    <div className={styles.currencyInfo}>
-                        <img
-                            src={currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_icon || ''}
-                            alt={selectedCurrency.value}
-                            className={styles.currencyIconInCard}
-                        />
-                        <h3 className={styles.currency}>
-                            {selectedCurrency.value}
-                            <span className={styles.country}>
-                                {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
-                            </span>
-                        </h3>
-                    </div>
+                <div className={styles.currencyInfo}>
+                    <img
+                        src={currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_icon || ''}
+                        alt={selectedCurrency.value}
+                        className={styles.currencyIconInCard}
+                    />
+                    <h3 className={styles.currency}>
+                        {selectedCurrency.value}
+                        <span className={styles.country}>
+                            {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
+                        </span>
+                    </h3>
+                </div>
+
+                    
                     <p className={styles.balanceLabel}>Balance:</p>
                     <p className={styles.balanceAmount}>
-                        {selectedCurrency.value === 'INR' ? '₹' : '$'} {balances[selectedCurrency.value]?.toFixed(2) || '0.00'}
+                        {currencySymbols[selectedCurrency.value] || ''}{' '}
+                        {balances[selectedCurrency.value]?.toFixed(2) || '0.00'}
                     </p>
                 </div>
             </div>

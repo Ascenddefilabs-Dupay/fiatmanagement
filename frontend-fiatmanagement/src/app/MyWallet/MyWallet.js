@@ -15,6 +15,17 @@ const MyWallet = () => {
         AUD: 0.00,
         CAD: 0.00,
     });
+
+
+    const currencySymbols = {
+        INR: '₹',
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        AUD: 'A$',
+        CAD: 'C$',
+        // Add more currencies as needed
+    };
     const [selectedCurrency, setSelectedCurrency] = useState({ value: 'INR', label: 'INR' });
     const [selectedCountry, setSelectedCountry] = useState('India');
     const [selectedCurrencyImage, setSelectedCurrencyImage] = useState(''); 
@@ -24,7 +35,7 @@ const MyWallet = () => {
 
     useEffect(() => {
         // Fetch wallet details and user currencies
-        axios.get('http://localhost:8000/api/user_currencies/?wallet_id=wa0000000001')
+        axios.get('http://localhost:8000/api/user_currencies/?wallet_id=Wa0000000001')
             .then(response => {
                 const userCurrencies = response.data;
                 const updatedBalances = {};
@@ -143,7 +154,9 @@ const MyWallet = () => {
                         <span className={styles.currencyCountry}>{selectedCountry}</span>
                     </div>
                     <div className={styles.balanceAmount}>
-                        ₹ {balances[selectedCurrency.value] ? balances[selectedCurrency.value].toFixed(2) : '0.00'}
+                    <p className={styles.balanceAmount}>
+                        {currencySymbols[selectedCurrency.value] || ''} {(balances[selectedCurrency.value] !== undefined ? balances[selectedCurrency.value].toFixed(2) : '0.00')}
+                    </p>
                     </div>
                 </div>
             </div>

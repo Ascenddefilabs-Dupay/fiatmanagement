@@ -9,6 +9,7 @@ export default function AddBankForm() {
   const [statusMessage, setStatusMessage] = useState('');
   const [errors, setErrors] = useState({});
   const router = useRouter();
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +25,8 @@ export default function AddBankForm() {
       });
 
       if (res.ok) {
-        window.alert('Bank added successfully!');
+
+        setAlertMessage('Bank added successfully!');
         router.push ('http://localhost:3003/Crypto_Wallet/Dashboard')
         setBankName('');
         setBankIcon(null);
@@ -43,9 +45,18 @@ export default function AddBankForm() {
   const handleLeftArrowClick = () => {
     window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
 };
+const handleCloseAlert = () => {
+  setAlertMessage("");
+}
 
   return (
     <div className={styles.container}>
+      {alertMessage && (
+                <div className={styles.customAlert}>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
       <div className={styles.topBar}>
         <button className={styles.topBarButton}>
           <FaArrowLeft className={styles.topBarIcon} onClick={handleLeftArrowClick}/>

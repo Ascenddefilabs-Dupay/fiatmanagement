@@ -46,7 +46,7 @@
 
 .addBankButton {
     padding: 10px;
-    background-color: #007bff;
+    background: linear-gradient(90deg, #007bff9f, #800080);
     color: white;
     border: none;
     border-radius: 4px;

@@ -8,6 +8,7 @@ export default function AddCurrencyForm() {
   const [currencyIcon, setCurrencyIcon] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export default function AddCurrencyForm() {
       });
 
       if (res.ok) {
-        window.alert('Currency added successfully!');
+        setAlertMessage('Currency added successfully!');
         setCurrencyCode('');
         setCurrencyCountry('');
         setCurrencyIcon(null);
@@ -40,9 +41,19 @@ export default function AddCurrencyForm() {
       setStatusMessage('An error occurred.');
     }
   };
+  const handleCloseAlert = () => {
+    setAlertMessage("");
+  }
+
 
   return (
     <div className={styles.container}>
+      {alertMessage && (
+                <div className={styles.customAlert}>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
       <div className={styles.topBar}>
         <button className={styles.topBarButton}>
           <FaArrowLeft className={styles.topBarIcon} />

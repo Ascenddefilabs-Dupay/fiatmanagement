@@ -1,12 +1,12 @@
 .container {
   
   
-  padding: 30px;
+  padding: 20px;
   border-radius: 8px;
-  height: 550px;
-  width: 320px;
+  height: 100vh;
+  width: 400px;
   margin: 0 auto;
-  margin-top: 70px;
+  /* margin-top: 70px; */
   
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   
@@ -66,7 +66,7 @@
 }
 
 .submitButton {
-  background-color: #007bff;
+  background: linear-gradient(90deg, #007bff9f, #800080);
   color: white;
   border: none;
   padding: 10px;
@@ -113,4 +113,33 @@
 
 .error {
   color: red;
+}
+.customAlert {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: gray;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+  width: 20%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.customAlert p {
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+.closeButton {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
 }
