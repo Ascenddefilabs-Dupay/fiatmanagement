@@ -18,7 +18,7 @@ const SetLimit = () => {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/user/5eaad320-560b-45b1-8b87-d6eb1dced6fe/')
+        axios.get('http://localhost:8000/api/user/DupC0001/')
             .then(response => {
                 setWalletDetails(response.data);
             })
@@ -63,7 +63,7 @@ const SetLimit = () => {
 
         if (walletDetails) {
             try {
-                const response = await axios.put('http://localhost:8000/api/user/5eaad320-560b-45b1-8b87-d6eb1dced6fe/', {
+                const response = await axios.put('http://localhost:8000/api/user/DupC0001/', {
                     ...walletDetails,
                     users_data_limit: parsedAmount,
                     limit_type: limitType
@@ -126,3 +126,4 @@ const SetLimit = () => {
 };
 
 export default SetLimit;
+

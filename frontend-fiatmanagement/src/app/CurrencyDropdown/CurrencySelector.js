@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import country_list from '../currency-conversion/country-list';
+import country_list from './country-list';
 import styles from './CurrencySelector.module.css';
 
 const CurrencySelector = () => {
