@@ -37,36 +37,33 @@ export default function FiatWalletForm() {
     event.preventDefault();
     setError({});
     setSuccess(null);
-
+  
     // Perform validation checks
     if (!validateFields()) {
       // Errors are displayed below the fields, no alert needed for errors
       return;
     }
-
+  
     try {
       // Fetch the user ID by username
+      const userResponse = await axios.get(`http://localhost:8000/api/user/?username=${username}`);
       
-      const userResponse = await axios.get(`http://localhost:8000/api/user/`);
-      
-
       if (userResponse.data.length === 0) {
         setError({ form: 'Username does not exist.' });
         return;
       }
-      
-
+  
       const userId = userResponse.data[0].id; // Get the user ID from the response
-      
-
+  
       // Now create the fiat wallet with the correct user ID
       const response = await axios.post('http://localhost:8000/api/fiat_wallets/', {
         fiat_wallet_type: walletType,
         fiat_wallet_currency: walletCurrency.toUpperCase(),
-        fiat_wallet_username: username, // Send the user ID instead of username
+        fiat_wallet_username: username, // Keep username in the request for additional checks
         fiat_wallet_phone_number: phoneNumber,
+        user: userId // Send the user ID in the request body
       });
-
+  
       setSuccess('Wallet created successfully!');
       setAlertMessage('Wallet created successfully!');
       setPhoneNumber('');
@@ -86,6 +83,7 @@ export default function FiatWalletForm() {
       console.error('Error creating wallet:', error);
     }
   };
+  
   const handleCloseAlert = () => {
     setAlertMessage('')
   }

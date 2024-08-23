@@ -4,6 +4,10 @@ from django.core.validators import RegexValidator
 from django.db.models import Max
 import random
 from cloudinary.models import CloudinaryField # type: ignore
+import qrcode
+from io import BytesIO
+import base64
+
 
 # Create your models here.
 class Project(models.Model):
@@ -18,7 +22,7 @@ class Project(models.Model):
 
 
 class User(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=20, primary_key=True, unique=True, editable=False)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(
@@ -36,11 +40,24 @@ class User(models.Model):
     users_data_limit = models.DecimalField(
         max_digits=18,
         decimal_places=2,
-        default=0,  # Default limit can be 0 or any other appropriate value
+        default=0,
     )
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            last_user = User.objects.all().aggregate(largest_id=Max('id'))
+            if last_user['largest_id']:
+                last_id_number = int(last_user['largest_id'][4:])  # Extract numeric part
+                new_id_number = last_id_number + 1
+            else:
+                new_id_number = 1  # Start from "DupC0001"
+
+            self.id = f"DupC{new_id_number:04d}"  # Format with leading zeros
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+    
 
 class FiatWallet(models.Model):
     fiat_wallet_id = models.CharField(
@@ -49,7 +66,7 @@ class FiatWallet(models.Model):
         unique=True,
         editable=False
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     fiat_wallet_type = models.CharField(max_length=50)
     fiat_wallet_currency = models.CharField(max_length=10)
     fiat_wallet_address = models.CharField(
@@ -60,8 +77,7 @@ class FiatWallet(models.Model):
     fiat_wallet_balance = models.DecimalField(
         max_digits=18, 
         decimal_places=8, 
-        default=0, 
-        
+        default=0
     )
     fiat_wallet_created_time = models.DateTimeField(auto_now_add=True)
     fiat_wallet_updated_time = models.DateTimeField(auto_now=True)
@@ -78,16 +94,39 @@ class FiatWallet(models.Model):
         unique=True
     )
     fiat_wallet_username = models.CharField(max_length=50, unique=True)
-    # fiat_wallet_amount_limit = models.DecimalField(
-    #     max_digits=18,
-    #     decimal_places=2,
-    #     default=0,
-    # )
-    # fiat_wallet_limit_type = models.CharField(max_length=10, choices=[('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly')], default='Daily')
+    qr_code = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.user.name} - {self.fiat_wallet_type}"
+    def save(self, *args, **kwargs):
+        self.fiat_wallet_currency = self.fiat_wallet_currency.upper()
 
+        # Generate fiat_wallet_id with first letter capital and remaining characters camelCase
+        if not self.fiat_wallet_id:
+            max_id = FiatWallet.objects.aggregate(max_id=Max('fiat_wallet_id'))['max_id']
+            if max_id is None:
+                next_id_number = 1
+            else:
+                numeric_part = int(max_id[2:]) + 1
+                next_id_number = numeric_part
+            
+            next_id = f"wa{next_id_number:010d}"
+            camel_case_id = next_id.capitalize()  # Capitalize the first letter, the rest remain camelCase
+            self.fiat_wallet_id = camel_case_id
+
+        # Check for fiat_wallet_address
+        if not self.fiat_wallet_address:
+            self.fiat_wallet_address = self.generate_wallet_address()
+
+        # Automatically assign a user if none is provided
+        if not self.user_id:
+            default_user = User.objects.first()  # Get the first user from the database
+            if default_user is None:
+                raise ValueError("No user available. Please create a user first.")
+            self.user = default_user
+
+        # Generate QR code if necessary
+        self.generate_qr_code()
+
+        super().save(*args, **kwargs)
     def generate_wallet_address(self):
         currency_prefix = self.fiat_wallet_currency[:3].upper()
 
@@ -95,29 +134,31 @@ class FiatWallet(models.Model):
             return currency_prefix + ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=63))
         else:
             raise ValueError("Unsupported currency type")
+    def __str__(self):
+        return f"{self.user.name} - {self.fiat_wallet_type}"
 
-    def save(self, *args, **kwargs):
-        self.fiat_wallet_currency = self.fiat_wallet_currency.upper()
-        if not self.fiat_wallet_id:
-            max_id = FiatWallet.objects.aggregate(max_id=Max('fiat_wallet_id'))['max_id']
-            if max_id is None:
-                next_id = 'wa0000000001'
-            else:
-                numeric_part = int(max_id[2:]) + 1
-                next_id = f"wa{numeric_part:010d}"
-            self.fiat_wallet_id = next_id
-        
-        if not self.fiat_wallet_address:
-            self.fiat_wallet_address = self.generate_wallet_address()
 
-        # Set a default user if none is provided
-        if not self.user_id:
-            default_user = User.objects.first()  # Get the default user from the database
-            if default_user is None:
-                raise ValueError("No default user available. Please create a user first.")
-            self.user = default_user
+    def generate_qr_code(self):
+        print("hello world......")
+        qr_data = f"{self.fiat_wallet_username}-{self.fiat_wallet_phone_number}"
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
 
-        super().save(*args, **kwargs)
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        self.qr_code = img_str
+        print(qr)
+
+    # class Meta:
+    #     db_table = 'fiat_wallet'
 
 
 class Currency(models.Model):

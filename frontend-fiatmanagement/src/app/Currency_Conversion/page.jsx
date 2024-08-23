@@ -1,8 +1,8 @@
 "use client";
-import './page.css';
+import styles from './page.css';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import country_list from '../currency-conversion/country-list';
+import country_list from '../CurrencyDropdown/country-list';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
@@ -13,7 +13,6 @@ const CurrencyConverter = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const selectedCurrency = searchParams.get('currency');
-
     const [fromCurrency, setFromCurrency] = useState('ETH'); // Default value
     const [toCurrency, setToCurrency] = useState('INR');
     const [amount, setAmount] = useState('0');
@@ -27,6 +26,7 @@ const CurrencyConverter = () => {
     const [credit, setCredit] = useState('IMPS');
     const [provide, setProvide] = useState('Onramp Money');
     const cryptoApiKey = 'd87e655eb0580e20c381f19ecd513660587ebed07d93f102ac46a3efe32596ca';
+    const [alertMessage, setAlertMessage] = useState('');
 
     useEffect(() => {
         if (selectedCurrency) {
@@ -99,7 +99,7 @@ const CurrencyConverter = () => {
                 name: 'DUPAY',
                 description: 'Payment for currency conversion',
                 handler: function (response) {
-                    alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+                    setAlertMessage(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
                     // Handle payment success
                 },
                 prefill: {
@@ -118,7 +118,7 @@ const CurrencyConverter = () => {
             const rzp1 = new window.Razorpay(options);
             rzp1.open();
         } else {
-            alert("Razorpay script not loaded.");
+            setAlertMessage("Razorpay script not loaded.");
         }
     };
 
@@ -200,8 +200,17 @@ const CurrencyConverter = () => {
     const navigateToDashboard = () => {
         window.location.href = 'http://localhost:3003/Crypto_Wallet/Dashboard';
     };
+    const handleCloseAlert = () => {
+        setAlertMessage('');
+    };
     return (
         <div className="converterContainer">
+            {alertMessage && (
+                <div className='customAlert'>
+                    <p>{alertMessage}</p>
+                    <button onClick={handleCloseAlert} className={styles.closeButton}>OK</button>
+                </div>
+            )}
             <div className="topBar">
                 <button className="topBarButton">
                     <FaArrowLeft className="topBarIcon" onClick={navigateToDashboard} />

@@ -16,11 +16,11 @@ body {
     flex-direction: column;
     border-radius: 8px;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
     position: relative;
     justify-content: space-between;
-    width: 320px; /* Set width to 320px */
-    height: 540px; /* Set height to 600px */
+    width: 400px; /* Set width to 320px */
+    height: 100vh; /* Set height to 600px */
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     
 }
@@ -59,11 +59,7 @@ body {
 
 
 
-.buyContainer{
-    font-size: 12px;
-    margin-top: 0;
-    margin-bottom: 0;
-}
+
 .usingUtorg {
     margin-top: auto; /* Pushes it to the bottom of the container */
     display: flex;
@@ -348,6 +344,8 @@ body {
     width: 100%;
     margin: 0; /* Remove margin */
     padding: 0; /* Remove padding */
+    margin-left: -35px;
+    font-size: 12px;
 }
 
 
@@ -623,7 +621,7 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    margin-left: 110px;
+    margin-left: 47%;
     font-size: 12px; /* Adjust size as needed */
     margin-top: 2px;
     
@@ -658,7 +656,7 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    margin-left: 97px;
+    margin-left: 42%;
     font-size: 12px; /* Adjust size as needed */
     margin-top: 0;
     margin-bottom: 0;
@@ -667,4 +665,31 @@ body {
 .spacer {
     width: 15px; /* Adjust the space as needed */
 }
-
+.customAlert {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: gray;
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 30%;
+    max-width: 320px;
+    text-align: center;
+  }
+  
+  .customAlert p {
+    margin: 0 0 15px;
+  }
+  
+  .closeButton {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+  }
