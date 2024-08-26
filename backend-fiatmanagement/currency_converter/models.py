@@ -1,3 +1,6 @@
+import re
+from django.db import connection
+
 from django.db import models
 import uuid
 from django.core.validators import RegexValidator
@@ -185,3 +188,59 @@ class UserCurrency(models.Model):
 
     def __str__(self):
         return f"{self.wallet_id} - {self.currency_type} - Balance: {self.balance}"
+    
+class Transaction(models.Model):
+    transaction_id = models.CharField(max_length=100, unique=True, blank=True, editable=False, primary_key=True)
+    transaction_type = models.CharField(max_length=50 ,null=True, blank=True)
+    transaction_amount = models.DecimalField(max_digits=18, decimal_places=8 ,null=True, blank=True)
+    transaction_currency = models.CharField(max_length=10 ,null=True, blank=True)
+    transaction_timestamp = models.DateTimeField(auto_now_add=True)
+    transaction_status = models.CharField(max_length=50 ,null=True, blank=True)
+    transaction_hash = models.CharField(max_length=255, unique=True)
+    transaction_fee = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
+    user_phone_number = models.CharField(max_length=15 , null=True, blank=True)
+    wallet_id = models.CharField(max_length=100 ,null=True, blank=True)
+    sender_mobile_number= models.CharField(max_length=15 ,null=True, blank=True)
+    fiat_address = models.CharField(max_length=255, null=True, blank=True)
+    transaction_description = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = 'transaction_table'
+
+    def __str__(self):
+        return f"{self.transaction_id} - {self.transaction_amount} {self.transaction_currency}"
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = self.generate_transaction_id()
+
+        # if not self.wallet_id:
+        #     self.wallet_id = self.wallet_id_fetch()
+
+        if not self.sender_mobile_number:
+            self.sender_mobile_number = self.sender_mobile_number_fetch()
+        
+
+        super().save(*args, **kwargs)
+
+    def generate_transaction_id(self):
+        latest_transaction = Transaction.objects.order_by('-transaction_id').first()
+        if latest_transaction and re.search(r'\d+', latest_transaction.transaction_id):
+            last_id = latest_transaction.transaction_id
+            number = int(re.search(r'\d+', last_id).group())
+            new_number = number + 1
+            return f'TRANS{new_number:06d}'
+        return 'TRANS000001'
+    
+    # def wallet_id_fetch(self):
+    #     with connection.cursor() as cursor:
+    #         cursor.execute("SELECT * FROM currency_converter_fiatwallet")
+    #         rows = cursor.fetchall()
+    #     print(rows[-1][0])
+    #     return rows[-1][0]
+    def sender_mobile_number_fetch(self):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM currency_converter_fiatwallet")
+            rows = cursor.fetchall()
+        print(rows[-1][7])
+        return rows[-1][7]

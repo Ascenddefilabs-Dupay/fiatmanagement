@@ -4,6 +4,7 @@ from .models import Bank
 from .models import FiatWallet,User
 from .models import Currency
 from .models import UserCurrency
+from .models import Transaction
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,4 +54,15 @@ class CurrencySerializer(serializers.ModelSerializer):
     def validate_currency_country(self, value):
         if Currency.objects.filter(currency_country=value).exists():
             raise serializers.ValidationError("Currency country already exists.")
+        return value
+    
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'  # This includes all fields of the Transaction model
+
+    # Optionally, you can add custom validation or methods here
+    def validate_transaction_amount(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Transaction amount cannot be negative.")
         return value
