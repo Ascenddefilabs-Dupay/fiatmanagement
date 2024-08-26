@@ -19,6 +19,10 @@ from decimal import Decimal, InvalidOperation
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from .models import Transaction
+from .serializers import TransactionSerializer
+from django.db import connection
+
 
 
 
@@ -190,6 +194,101 @@ class UserCurrencyViewSet(viewsets.ViewSet):
         user_currencies = UserCurrency.objects.filter(wallet_id=wallet_id)
         serializer = UsersCurrenciesSerializer(user_currencies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
 
 
+
+
+    
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        fiat_address = request.data.get('fiat_address')
+        transaction_amount = float(request.data.get('transaction_amount'))
+        print(transaction_amount)
+        transaction_currency = request.data.get('transaction_currency')
+
+        # Fetch wallet info based on fiat address
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM currency_converter_fiatwallet WHERE fiat_wallet_address = %s", [fiat_address])
+            fiat_wallet = cursor.fetchone()
+
+        if not fiat_wallet:
+            return JsonResponse({'status': 'address_failure', 'message': 'Fiat Address does not exist.'})
+
+        try:
+            # Fetch the last row of the wallet table
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT fiat_wallet_id FROM currency_converter_fiatwallet ORDER BY fiat_wallet_id DESC LIMIT 1")
+                last_wallet = cursor.fetchone()
+                print("1")
+
+            if not last_wallet:
+                print("2")
+                return JsonResponse({'status': 'failure', 'message': 'No wallet records found.'})
+                
+
+            last_wallet_id = last_wallet[0]  # Wallet ID is in the first column
+
+            # Check if the selected currency exists in the user_currencies table for the last wallet ID
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT balance FROM user_currencies WHERE wallet_id = %s AND currency_type = %s",
+                    [last_wallet_id, transaction_currency]
+                )
+                currency_balance = cursor.fetchone()
+                print("3")
+
+            
+
+            
+                
+
+            # Deduct the transaction amount from the selected currency balance
+            # updated_balance = current_balance - transaction_amount
+            # with connection.cursor() as cursor:
+            #     cursor.execute(
+            #         "UPDATE user_currencies SET balance = %s WHERE wallet_id = %s AND currency_type = %s",
+            #         [updated_balance, last_wallet_id, transaction_currency]
+            #     )
+            #     print("6")
+
+            # Add the transaction amount to the fiat wallet's currency balance
+            # fiat_wallet_id = fiat_wallet[0]
+            # with connection.cursor() as cursor:
+            #     cursor.execute(
+            #         "SELECT balance FROM user_currencies WHERE wallet_id = %s AND currency_type = %s",
+            #         [fiat_wallet_id, transaction_currency]
+            #     )
+            #     fiat_wallet_balance = cursor.fetchone()
+            #     print("7")
+
+            # if fiat_wallet_balance:
+            #     # Update existing row
+            #     new_fiat_balance = float(fiat_wallet_balance[0]) + transaction_amount
+            #     with connection.cursor() as cursor:
+            #         cursor.execute(
+            #             "UPDATE user_currencies SET balance = %s WHERE wallet_id = %s AND currency_type = %s",
+            #             [new_fiat_balance, fiat_wallet_id, transaction_currency]
+            #         )
+            #         print("8")
+            # else:
+            #     # Insert new row
+            #     with connection.cursor() as cursor:
+            #         cursor.execute(
+            #             "INSERT INTO user_currencies (wallet_id, currency_type, balance) VALUES (%s, %s, %s)",
+            #             [fiat_wallet_id, transaction_currency, transaction_amount]
+            #         )
+            #         print("9")
+
+            # Proceed with creating the transaction record
+            return super().create(request, *args, **kwargs)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 
