@@ -297,28 +297,28 @@ const WithdrawForm = () => {
             </div>
             
             <div className={styles.cardContainer}>
-                <div className={styles.balanceCard}>
-                    <div className={styles.currencyInfo}>
-                        <img
-                            src={currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_icon || ''}
-                            alt={selectedCurrency.value}
-                            className={styles.currencyIconInCard}
-                        />
-                        <h3 className={styles.currency}>
-                            {selectedCurrency.value} 
-                            <span className={styles.country}>
-                                {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
-                            </span>
-                        </h3>
-                    </div>
-                    <p className={styles.balanceLabel}>Balance:</p>
-                    <p className={styles.balanceAmount}>
-                        {currencySymbols[selectedCurrency.value] || ''} 
-                        {balances[selectedCurrency.value] !== undefined ? balances[selectedCurrency.value].toFixed(2) : '0.00'}
-                    </p>
+                        <div className={styles.balanceCard}>
+                            <div className={styles.currencyInfo}>
+                                <img
+                                    src={currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_icon || ''}
+                                    alt={selectedCurrency.value}
+                                    className={styles.currencyIconInCard}
+                                />
+                                <h3 className={styles.currency}>
+                                    {selectedCurrency.value}
+                                    <span className={styles.country}>
+                                        {currencies.find(currency => currency.currency_code === selectedCurrency.value)?.currency_country || ''}
+                                    </span>
+                                </h3>
+                            </div>
 
-                </div>
-            </div>
+                            {/* <p className={styles.balanceLabel}>Balance:</p> */}
+                            <p className={styles.balanceAmount}>
+                                {currencySymbols[selectedCurrency.value] || ''}{' '}
+                                {balances[selectedCurrency.value]?.toFixed(2) || '0.00'}
+                            </p>
+                        </div>
+                    </div>
 
             <div className={styles.form}>
                 <label className={styles.label}>Choose Currency:</label>
