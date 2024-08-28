@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-gqj&ta5j_u0hy6ck^2&r!yy&-f84cd8)ix@$8nfl7ycwe%3ift
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'fiatmanagement-rcfpsxcera-uc.a.run.app/',
+]
 
 
 # Application definition
@@ -62,6 +64,14 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+]
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
