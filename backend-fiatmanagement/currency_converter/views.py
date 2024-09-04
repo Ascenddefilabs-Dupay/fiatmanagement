@@ -21,105 +21,8 @@ from django.db import transaction
 from .models import Transaction
 from .serializers import TransactionSerializer
 from django.db import connection
-import json
+# import json
 from rest_framework import viewsets
-from .models import CustomUser, Project
-from .serializers import CustomUserSerializer,GoogleSignupSerializer
-from rest_framework.decorators import api_view
-from google.auth.transport import requests
-from google.oauth2 import id_token
-from django.core.mail import send_mail
-from django.conf import settings 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from decimal import Decimal, InvalidOperation
-from .models import FiatWallet, UserCurrency
-
-
-
-class RegisterUserView(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-    
-    def create(self, request, *args, **kwargs):
-        email = request.data.get('user_email')  # Change 'user_email' to match your field name
-        if CustomUser.objects.filter(user_email=email).exists():
-            return Response({'error': 'Email is already in use'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response({'success': 'Registration successful!'}, status=status.HTTP_201_CREATED, headers=headers)
-        
-        # Log the errors for easier debugging
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-def register_user(request):
-    if request.method == 'POST':
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@csrf_exempt  # Use with caution; for development or specific use cases
-def check_email(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        email = data.get('email')
-        email_exists = CustomUser.objects.filter(user_email=email).exists()
-        return JsonResponse({'exists': email_exists})
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-class GenerateOTP(APIView):
-    def post(self, request):
-        user_email = request.data.get('email')
-        otp = request.data.get('otp')
-
-        # Store OTP in the database or cache here, and send it to the user
-        send_mail(
-            'Your OTP Code',
-            f'Your OTP code is {otp}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-
-        return Response({'success': True, 'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
-
-class RegisterUser(APIView):
-    def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response({'success': True, 'id': user.user_id}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class GoogleSignup(APIView):
-    def post(self, request):
-        id_token_str = request.data.get('idToken')
-        try:
-            id_info = id_token.verify_oauth2_token(id_token_str, requests.Request(), settings.GOOGLE_CLIENT_ID)
-            email = id_info.get('email')
-            first_name = id_info.get('given_name', '')
-            last_name = id_info.get('family_name', '')
-
-            # Create or update user with Google data
-            user, created = CustomUser.objects.get_or_create(
-                user_email=email,
-                defaults={'user_first_name': first_name, 'user_last_name': last_name}
-            )
-
-            if not created:
-                user.user_first_name = first_name
-                user.user_last_name = last_name
-                user.save()
-
-            return Response({'success': True, 'id': user.user_id}, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -145,19 +48,9 @@ class BankViewSet(viewsets.ModelViewSet):
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
 
-
-
 class UsersCurrenciesViewSet(viewsets.ModelViewSet):
     queryset = UserCurrency.objects.all()
     serializer_class = UsersCurrenciesSerializer
-
-
-
-
-
-
-
-
 class UserCurrencyViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], url_path='create_or_update')
     def create_or_update(self, request, *args, **kwargs):
@@ -282,12 +175,6 @@ class UserCurrencyViewSet(viewsets.ViewSet):
         serializer = UsersCurrenciesSerializer(user_currencies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    
-
-
-
-
-    
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
@@ -299,7 +186,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         print(transaction_amount)
         transaction_currency = request.data.get('transaction_currency')
 
-        # Fetch wallet info based on fiat address
+        
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM currency_converter_fiatwallet WHERE fiat_wallet_address = %s", [fiat_address])
             fiat_wallet = cursor.fetchone()
@@ -308,7 +195,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             return JsonResponse({'status': 'address_failure', 'message': 'Fiat Address does not exist.'})
 
         try:
-            # Fetch the last row of the wallet table
+            
             with connection.cursor() as cursor:
                 cursor.execute("SELECT fiat_wallet_id FROM currency_converter_fiatwallet ORDER BY fiat_wallet_id DESC LIMIT 1")
                 last_wallet = cursor.fetchone()
@@ -319,9 +206,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 return JsonResponse({'status': 'failure', 'message': 'No wallet records found.'})
                 
 
-            last_wallet_id = last_wallet[0]  # Wallet ID is in the first column
+            last_wallet_id = last_wallet[0]  
 
-            # Check if the selected currency exists in the user_currencies table for the last wallet ID
+            
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT balance FROM user_currencies WHERE wallet_id = %s AND currency_type = %s",
@@ -331,47 +218,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 print("3")
 
             
-
-            
-                
-
-            # Deduct the transaction amount from the selected currency balance
-            # updated_balance = current_balance - transaction_amount
-            # with connection.cursor() as cursor:
-            #     cursor.execute(
-            #         "UPDATE user_currencies SET balance = %s WHERE wallet_id = %s AND currency_type = %s",
-            #         [updated_balance, last_wallet_id, transaction_currency]
-            #     )
-            #     print("6")
-
-            # Add the transaction amount to the fiat wallet's currency balance
-            # fiat_wallet_id = fiat_wallet[0]
-            # with connection.cursor() as cursor:
-            #     cursor.execute(
-            #         "SELECT balance FROM user_currencies WHERE wallet_id = %s AND currency_type = %s",
-            #         [fiat_wallet_id, transaction_currency]
-            #     )
-            #     fiat_wallet_balance = cursor.fetchone()
-            #     print("7")
-
-            # if fiat_wallet_balance:
-            #     # Update existing row
-            #     new_fiat_balance = float(fiat_wallet_balance[0]) + transaction_amount
-            #     with connection.cursor() as cursor:
-            #         cursor.execute(
-            #             "UPDATE user_currencies SET balance = %s WHERE wallet_id = %s AND currency_type = %s",
-            #             [new_fiat_balance, fiat_wallet_id, transaction_currency]
-            #         )
-            #         print("8")
-            # else:
-            #     # Insert new row
-            #     with connection.cursor() as cursor:
-            #         cursor.execute(
-            #             "INSERT INTO user_currencies (wallet_id, currency_type, balance) VALUES (%s, %s, %s)",
-            #             [fiat_wallet_id, transaction_currency, transaction_amount]
-            #         )
-            #         print("9")
-
             # Proceed with creating the transaction record
             return super().create(request, *args, **kwargs)
 
