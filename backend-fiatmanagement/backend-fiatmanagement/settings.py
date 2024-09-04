@@ -28,12 +28,12 @@ SECRET_KEY = 'django-insecure-gqj&ta5j_u0hy6ck^2&r!yy&-f84cd8)ix@$8nfl7ycwe%3ift
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'fiatmanagement-rcfpsxcera-uc.a.run.app/',
+    'fiatmanagement-rcfpsxcera-uc.a.run.app',
+    
 ]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -101,13 +101,13 @@ WSGI_APPLICATION = 'backend-fiatmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_cockroachdb',
-        'NAME': 'Dupay',
-        'USER': 'Gtpl',
-        'PASSWORD': 'mu6-f6rSv9t_oCLSh6iFLg',
-        'HOST': 'meteor-dunnart-5620.7s5.aws-ap-south-1.cockroachlabs.cloud',
+        'NAME': 'dupay',
+        'USER': 'dupay',
+        'PASSWORD': 'lPVRIuSyVCJqfmghd7ckBw',
+        'HOST': 'chill-dibbler-5989.7s5.aws-ap-south-1.cockroachlabs.cloud',
         'PORT': '26257',
         'sslmode': 'disable'
-        }
+    }
     }
 
 CLOUDINARY_STORAGE = {
