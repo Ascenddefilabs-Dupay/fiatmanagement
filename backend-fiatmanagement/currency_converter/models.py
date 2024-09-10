@@ -11,7 +11,6 @@ import qrcode
 from io import BytesIO
 import base64
 from django.utils import timezone
-
 import re
 
 
@@ -36,6 +35,23 @@ class CustomUser(models.Model):
     user_last_name = models.CharField(max_length=30)
     user_dob = models.DateField()
     user_phone_number = models.BigIntegerField()
+    user_country = models.CharField(max_length=50)
+    user_city = models.CharField(max_length=50)
+    user_address_line_1 = models.CharField(max_length=255)  
+    user_address_line_2 = models.CharField(max_length=255) 
+    user_pin_code = models.BigIntegerField()
+    user_state = models.CharField(max_length=50)  
+    user_profile_photo = models.CharField(max_length=255, blank=True, null=True)
+    user_password = models.CharField(max_length=255)
+    user_type = models.CharField(max_length=50,default='customer')
+    user_old_password = models.CharField(max_length=128, blank=True, null=True)
+    user_joined_date = models.DateTimeField(default=timezone.now, blank=True, null=True)
+    last_login = models.DateTimeField(default=timezone.now,blank=True,null=True)
+
+
+    
+    
+
     users_daily_limit = models.DecimalField(
         max_digits=18,
         decimal_places=2,
@@ -49,7 +65,9 @@ class CustomUser(models.Model):
 
     class Meta:
         db_table = 'users'
-    
+    # def _str_(self):
+    # return f"{self.user_first_name} {self.user_last_name}"
+
 
 class FiatWallet(models.Model):
     fiat_wallet_id = models.CharField(
@@ -177,6 +195,8 @@ class UserCurrency(models.Model):
 
     def __str__(self):
         return f"{self.wallet_id} - {self.currency_type} - Balance: {self.balance}"
+    class Meta:
+        db_table = 'user_currencies'
     
 class Transaction(models.Model):
     transaction_id = models.CharField(max_length=100, unique=True, blank=True, editable=False, primary_key=True)
@@ -228,3 +248,14 @@ class Transaction(models.Model):
             rows = cursor.fetchall()
         print(rows[-1][7])
         return rows[-1][7]
+    
+
+
+
+#     from django.core.exceptions import ValidationError
+
+# def clean(self):
+#     # Check if a wallet already exists for the user with the same currency
+#     if FiatWallet.objects.filter(user=self.user, fiat_wallet_currency=self.fiat_wallet_currency).exists():
+#         raise ValidationError(f"User already has a wallet with currency: {self.fiat_wallet_currency}")
+#     return super().clean()
