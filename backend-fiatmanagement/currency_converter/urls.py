@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from currency_converter import views
-from .views import ProjectViewSet, BankViewSet,UserCurrencyViewSet,TransactionViewSet
+from .views import ProjectViewSet, BankViewSet,UserCurrencyViewSet,TransactionViewSet,AccountTypeList
 
 # Initialize the router
 router = DefaultRouter()
@@ -19,5 +19,5 @@ router.register(r'transactions', TransactionViewSet)
 # Define the URL patterns
 urlpatterns = [
     path('', include(router.urls)),  # Include the router URLs
-
+    path('account-types/', AccountTypeList.as_view(), name='account-type-list'),
 ]

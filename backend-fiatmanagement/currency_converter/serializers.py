@@ -5,6 +5,7 @@ from .models import FiatWallet,CustomUser
 from .models import Currency
 from .models import UserCurrency
 from .models import Transaction
+from .models import AdminCMS
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -22,7 +23,10 @@ class BankSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Bank name already exists.")
         return value
 
-
+class AdminCMSSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminCMS
+        fields = ['account_type', 'currency_type'] 
 
 class UsersCurrenciesSerializer(serializers.ModelSerializer):
     class Meta:

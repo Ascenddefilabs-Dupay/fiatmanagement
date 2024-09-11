@@ -6,12 +6,14 @@ import uuid
 from django.core.validators import RegexValidator
 from django.db.models import Max
 import random
-from cloudinary.models import CloudinaryField # type: ignore
-import qrcode
+# from cloudinary.models import CloudinaryField # type: ignore
+# import qrcode
 from io import BytesIO
 import base64
 from django.utils import timezone
 import re
+import qrcode
+
 
 
 
@@ -26,6 +28,15 @@ class Project(models.Model):
         return self.name
 
 
+class AdminCMS(models.Model):
+    account_type = models.CharField(max_length=100, primary_key=True)
+    currency_type = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.account_type
+
+    class Meta:
+        db_table = 'admincms'  # Explicitly set the table name
 
 class CustomUser(models.Model):
     user_id = models.CharField(max_length=8, primary_key=True)
@@ -103,7 +114,7 @@ class FiatWallet(models.Model):
         null=True,
         unique=True
     )
-    fiat_wallet_username = models.CharField(max_length=50, unique=True)
+    fiat_wallet_email = models.EmailField(unique=True)  # Change to EmailField
     qr_code = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -150,7 +161,7 @@ class FiatWallet(models.Model):
 
     def generate_qr_code(self):
         print("hello world......")
-        qr_data = f"{self.fiat_wallet_username}-{self.fiat_wallet_phone_number}"
+        qr_data = f"{self.fiat_wallet_email}-{self.fiat_wallet_phone_number}"
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -167,8 +178,8 @@ class FiatWallet(models.Model):
         self.qr_code = img_str
         print(qr)
 
-    # class Meta:
-    #     db_table = 'fiat_wallet'
+    class Meta:
+        db_table = 'fiat_wallet'
 
 
 class Currency(models.Model):
@@ -244,7 +255,7 @@ class Transaction(models.Model):
     
     def sender_mobile_number_fetch(self):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM currency_converter_fiatwallet")
+            cursor.execute("SELECT * FROM fiat_wallet")
             rows = cursor.fetchall()
         print(rows[-1][7])
         return rows[-1][7]
