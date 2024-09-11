@@ -23,6 +23,8 @@ from .serializers import TransactionSerializer
 from django.db import connection
 # import json
 from rest_framework import viewsets
+from .models import AdminCMS
+from .serializers import AdminCMSSerializer
 
 
 
@@ -224,4 +226,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-
+class AccountTypeList(APIView):
+    def get(self, request, format=None):
+        account_types = AdminCMS.objects.all()  # Fetch all account types
+        serializer = AdminCMSSerializer(account_types, many=True)  # Serialize the queryset
+        return Response(serializer.data, status=status.HTTP_200_OK)
