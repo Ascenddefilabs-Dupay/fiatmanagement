@@ -11,20 +11,27 @@ from .models import Currency
 from .serializers import CurrencySerializer
 from .models import UserCurrency
 from .serializers import UsersCurrenciesSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.views import APIView # type: ignore
+from rest_framework.response import Response # type: ignore
+from rest_framework import status # type: ignore
 from decimal import Decimal, InvalidOperation
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-from django.db import transaction
+from rest_framework.decorators import action # type: ignore
+from django.shortcuts import get_object_or_404 # type: ignore
+from django.db import transaction # type: ignore
 from .models import Transaction
 from .serializers import TransactionSerializer
-from django.db import connection
+from django.db import connection # type: ignore
 # import json
-from rest_framework import viewsets
+
+from rest_framework import viewsets # type: ignore
 from .models import AdminCMS
 from .serializers import AdminCMSSerializer
+from django.db.models import Count # type: ignore
+from django.utils.timezone import now, timedelta # type: ignore
+from django.http import JsonResponse # type: ignore
+
+
+
 
 
 
@@ -42,6 +49,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     # lookup_field="id"
+
+    
 
 class CurrencyViewSet(viewsets.ModelViewSet):
     queryset = Currency.objects.all()
@@ -226,8 +235,27 @@ class TransactionViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+
 class AccountTypeList(APIView):
     def get(self, request, format=None):
         account_types = AdminCMS.objects.all()  # Fetch all account types
         serializer = AdminCMSSerializer(account_types, many=True)  # Serialize the queryset
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+def get_user_registration_stats(request):
+    # Daily registered users (last 6 days)
+        daily_counts = CustomUser.objects.filter(
+            user_joined_date__gte=now() - timedelta(days=6)
+        ).extra(select={'day': 'date(user_joined_date)'}).values('day').annotate(count=Count('user_id'))
+
+        # Monthly registered users (last 6 months)
+        monthly_counts = CustomUser.objects.filter(
+            user_joined_date__gte=now() - timedelta(days=180)
+        ).extra(select={'month': "to_char(user_joined_date, 'YYYY-MM')"}).values('month').annotate(count=Count('user_id'))
+
+        return JsonResponse({
+            'daily': list(daily_counts),
+            'monthly': list(monthly_counts),
+        })
