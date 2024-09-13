@@ -259,3 +259,4 @@ def get_user_registration_stats(request):
             'daily': list(daily_counts),
             'monthly': list(monthly_counts),
         })
+
