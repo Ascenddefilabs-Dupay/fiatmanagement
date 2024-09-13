@@ -187,8 +187,10 @@ class Currency(models.Model):
     def __str__(self):
         return f"{self.currency_country} - {self.currency_code}"
     
+
     class Meta:
         db_table = 'currency'
+
 class Bank(models.Model):
     bank_name = models.CharField(max_length=100, unique=True)
     bank_icon = models.FileField(upload_to='bank_icons', blank=True, null=True)  # Use FileField for consistency
@@ -217,7 +219,7 @@ class Transaction(models.Model):
     transaction_currency = models.CharField(max_length=10 ,null=True, blank=True)
     transaction_timestamp = models.DateTimeField(auto_now_add=True)
     transaction_status = models.CharField(max_length=50 ,null=True, blank=True)
-    transaction_hash = models.CharField(max_length=255, unique=True)
+    transaction_hash = models.UUIDField()
     transaction_fee = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
     user_phone_number = models.CharField(max_length=15 , null=True, blank=True)
     wallet_id = models.CharField(max_length=100 ,null=True, blank=True)

@@ -13,6 +13,7 @@ router.register(r'user_currencies', UserCurrencyViewSet, basename='usercurrency'
 router.register(r'fiat_wallets', views.FiatWalletViewSet)
 router.register(r'user', views.UserViewSet)
 router.register(r'currencies', views.CurrencyViewSet)
+router.register(r'topup', views.CurrencyViewSet)
 router.register(r'banks', BankViewSet)
 router.register(r'transactions', TransactionViewSet)
 
@@ -20,6 +21,8 @@ router.register(r'transactions', TransactionViewSet)
 urlpatterns = [
     path('', include(router.urls)),  # Include the router URLs
     path('account-types/', AccountTypeList.as_view(), name='account-type-list'),
+
     path('user-registration-stats/', get_user_registration_stats, name='user-registration-stats')
+
 
 ]
