@@ -58,11 +58,6 @@ class CustomUser(models.Model):
     user_old_password = models.CharField(max_length=128, blank=True, null=True)
     user_joined_date = models.DateTimeField(default=timezone.now, blank=True, null=True)
     last_login = models.DateTimeField(default=timezone.now,blank=True,null=True)
-
-
-    
-    
-
     users_daily_limit = models.DecimalField(
         max_digits=18,
         decimal_places=2,
