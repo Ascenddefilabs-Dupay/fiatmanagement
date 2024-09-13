@@ -25,10 +25,14 @@ from django.db import connection # type: ignore
 
 from rest_framework import viewsets # type: ignore
 from .models import AdminCMS
+
+from .serializers import AdminCMSSerializer,TopupSerializer
+
 from .serializers import AdminCMSSerializer
 from django.db.models import Count # type: ignore
 from django.utils.timezone import now, timedelta # type: ignore
 from django.http import JsonResponse # type: ignore
+
 
 
 
@@ -53,8 +57,9 @@ class UserViewSet(viewsets.ModelViewSet):
     
 
 class CurrencyViewSet(viewsets.ModelViewSet):
-    queryset = Currency.objects.all()
-    serializer_class = CurrencySerializer
+    queryset = Currency.objects.all()  # Assuming you have a Currency model
+    serializer_class = CurrencySerializer 
+
 class BankViewSet(viewsets.ModelViewSet):
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
@@ -115,6 +120,62 @@ class UserCurrencyViewSet(viewsets.ViewSet):
                     "message": message,
                     "user_currency_balance": user_currency.balance
                 }, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['post'])
+    def topup(self, request):
+        wallet_id = request.data.get('wallet_id')
+        currency_code = request.data.get('currency_code')
+        amount = request.data.get('amount')
+        transaction_hash = request.data.get('transaction_hash')
+
+        if not wallet_id or not currency_code or amount is None or not transaction_hash:
+            return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            amount = Decimal(amount)
+            if amount <= 0:
+                return Response({"error": "Amount must be greater than zero"}, status=status.HTTP_400_BAD_REQUEST)
+        except (InvalidOperation, TypeError):
+            return Response({"error": "Invalid amount format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the FiatWallet
+        fiat_wallet = get_object_or_404(FiatWallet, fiat_wallet_id=wallet_id)
+
+        with transaction.atomic():
+            if fiat_wallet.fiat_wallet_currency == currency_code:
+                # Update fiat_wallet_balance
+                fiat_wallet.fiat_wallet_balance += amount
+                fiat_wallet.save()
+
+            # Update UserCurrency balance
+            user_currency, created = UserCurrency.objects.get_or_create(
+                wallet_id=wallet_id, 
+                currency_type=currency_code
+            )
+            user_currency.balance += amount
+            user_currency.save()
+
+            # Save the transaction
+            transaction_data = {
+                "wallet_id": wallet_id,
+                "transaction_amount": amount,
+                "transaction_currency": currency_code,
+                "transaction_type": "topup",
+                "fiat_address": fiat_wallet.fiat_wallet_address,
+                "transaction_status": "Success",
+                "transaction_fee": 0.0,
+                "transaction_hash": transaction_hash,
+                "transaction_method": "wallet-topup",
+            }
+
+            transaction_serializer = TransactionSerializer(data=transaction_data)
+            if transaction_serializer.is_valid():
+                transaction_serializer.save()
+                return Response({
+                    "message": "Top-up successful",
+                    "user_currency_balance": user_currency.balance
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response(transaction_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], url_path='withdraw')
     def withdraw(self, request, *args, **kwargs):
@@ -199,7 +260,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM currency_converter_fiatwallet WHERE fiat_wallet_address = %s", [fiat_address])
+            cursor.execute("SELECT * FROM fiat_wallet WHERE fiat_wallet_address = %s", [fiat_address])
             fiat_wallet = cursor.fetchone()
 
         if not fiat_wallet:
@@ -208,7 +269,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         try:
             
             with connection.cursor() as cursor:
-                cursor.execute("SELECT fiat_wallet_id FROM currency_converter_fiatwallet ORDER BY fiat_wallet_id DESC LIMIT 1")
+                cursor.execute("SELECT fiat_wallet_id FROM fiat_wallet ORDER BY fiat_wallet_id DESC LIMIT 1")
                 last_wallet = cursor.fetchone()
                 print("1")
 
@@ -244,6 +305,8 @@ class AccountTypeList(APIView):
 
 
 
+
+
 def get_user_registration_stats(request):
     # Daily registered users (last 6 days)
         daily_counts = CustomUser.objects.filter(
@@ -259,3 +322,4 @@ def get_user_registration_stats(request):
             'daily': list(daily_counts),
             'monthly': list(monthly_counts),
         })
+

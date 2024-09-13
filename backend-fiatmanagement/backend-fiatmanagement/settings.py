@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     'fiatmanagement-rcfpsxcera-uc.a.run.app',
     
 ]
-
+# ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'currency_converter',
-    # 'cloudinary_storage',
-    # 'cloudinary',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [

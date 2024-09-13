@@ -49,8 +49,9 @@ class UserSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = '__all__'
-
+        fields = ['currency_code', 'currency_country', 'currency_icon']
+    
+    currency_country = serializers.CharField(required=False)
     def validate_currency_code(self, value):
         if Currency.objects.filter(currency_code=value).exists():
             raise serializers.ValidationError("Currency code already exists.")
@@ -71,3 +72,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Transaction amount cannot be negative.")
         return value
+
+class TopupSerializer(serializers.Serializer):
+    wallet_id = serializers.CharField()
+    currency_code = serializers.CharField()  # Required field
+    currency_country = serializers.CharField()  # Required field
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
