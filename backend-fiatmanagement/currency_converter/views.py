@@ -32,9 +32,10 @@ from .serializers import AdminCMSSerializer
 from django.db.models import Count # type: ignore
 from django.utils.timezone import now, timedelta # type: ignore
 from django.http import JsonResponse # type: ignore
-
-
-
+from .models import UserCurrency
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 
 
@@ -67,6 +68,7 @@ class BankViewSet(viewsets.ModelViewSet):
 class UsersCurrenciesViewSet(viewsets.ModelViewSet):
     queryset = UserCurrency.objects.all()
     serializer_class = UsersCurrenciesSerializer
+    lookup_field="wallet_id"
 class UserCurrencyViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], url_path='create_or_update')
     def create_or_update(self, request, *args, **kwargs):
@@ -323,3 +325,68 @@ def get_user_registration_stats(request):
             'monthly': list(monthly_counts),
         })
 
+
+
+@csrf_exempt
+@require_POST
+def convert_currency(request):
+    try:
+        data = json.loads(request.body)
+        wallet_id = data['wallet_id']
+        source_currency = data['source_currency']
+        destination_currency = data['destination_currency']
+        amount = data['amount']
+        conversion_rate = data['conversion_rate']
+        
+        # Convert amount and conversion_rate to Decimal for precise arithmetic
+        amt = Decimal(str(amount))
+        con_rate = Decimal(str(conversion_rate))
+
+        # Fetch the relevant user currencies
+        source_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=source_currency).first()
+        destination_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=destination_currency).first()
+
+        if not source_currency_obj or not destination_currency_obj:
+            return JsonResponse({'status': 'error', 'message': 'Invalid currencies or wallet ID'}, status=400)
+
+        if source_currency_obj.balance < amt:
+            return JsonResponse({'status': 'error', 'message': 'Insufficient balance'}, status=400)
+
+        # Deduct the source amount and add the converted amount
+        source_currency_obj.balance -= amt
+        source_currency_obj.save()
+
+        # Calculate the converted amount
+        converted_amount = amt * con_rate
+        destination_currency_obj.balance += converted_amount
+        destination_currency_obj.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Currency conversion successful'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    
+# @csrf_exempt
+# @require_POST
+# def validate_currencies(request):
+#     try:
+#         data = json.loads(request.body)
+#         wallet_id = data['wallet_id']
+#         source_currency = data['source_currency']
+#         destination_currency = data['destination_currency']
+        
+#         # Check if the source and destination currencies exist
+#         source_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=source_currency).first()
+#         destination_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=destination_currency).first()
+
+#         if not source_currency_obj:
+#             return JsonResponse({'status': 'error', 'message': f'{source_currency} not found for this wallet'}, status=400)
+
+#         if not destination_currency_obj:
+#             return JsonResponse({'status': 'error', 'message': f'{destination_currency} not found for this wallet'}, status=400)
+
+#         return JsonResponse({'status': 'success', 'message': 'Currencies exist'})
+
+#     except Exception as e:
+#         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
