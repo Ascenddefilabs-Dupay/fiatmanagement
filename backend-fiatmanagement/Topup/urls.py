@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from currency_converter import views
+from Topup import views
 from .views import ProjectViewSet, BankViewSet,UserCurrencyViewSet,TransactionViewSet,AccountTypeList,get_user_registration_stats
 
 # Initialize the router

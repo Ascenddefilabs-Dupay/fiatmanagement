@@ -4,5 +4,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('fiatmanagementapi/', include('currency_converter.urls')),
+    path('fiatmanagementapi/', include('Topup.urls')),
 ]

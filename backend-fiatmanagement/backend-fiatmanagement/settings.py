@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'currency_converter',
+    'Topup',
     'cloudinary_storage',
     'cloudinary',
 ]
