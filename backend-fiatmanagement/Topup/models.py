@@ -147,13 +147,13 @@ class FiatWallet(models.Model):
         img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
         self.qr_code = img_str
 
-    def clean(self):
-        # Check if the fiat_wallet_id or fiat_wallet_address already exists for the same user
-        if FiatWallet.objects.filter(fiat_wallet_id=self.fiat_wallet_id).exclude(pk=self.pk).exists():
-            raise ValidationError(f"Fiat wallet with this fiat wallet id already exists.")
-        if FiatWallet.objects.filter(fiat_wallet_address=self.fiat_wallet_address).exclude(pk=self.pk).exists():
-            raise ValidationError(f"Fiat wallet with this fiat wallet address already exists.")
-        super().clean()
+    # def clean(self):
+    #     # Check if the fiat_wallet_id or fiat_wallet_address already exists for the same user
+    #     if FiatWallet.objects.filter(fiat_wallet_id=self.fiat_wallet_id).exclude(pk=self.pk).exists():
+    #         raise ValidationError(f"Fiat wallet with this fiat wallet id already exists.")
+    #     if FiatWallet.objects.filter(fiat_wallet_address=self.fiat_wallet_address).exclude(pk=self.pk).exists():
+    #         raise ValidationError(f"Fiat wallet with this fiat wallet address already exists.")
+    #     super().clean()
 
     class Meta:
         db_table = 'fiat_wallet'
