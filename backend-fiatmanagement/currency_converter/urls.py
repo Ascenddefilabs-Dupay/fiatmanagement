@@ -12,8 +12,12 @@ router.register('projects', ProjectViewSet)
 router.register(r'user_currencies', UserCurrencyViewSet, basename='usercurrency')
 router.register(r'fiat_wallets', views.FiatWalletViewSet)
 router.register(r'user', views.UserViewSet)
-router.register(r'currencies', views.CurrencyViewSet)
-# router.register(r'topup', views.CurrencyViewSet)
+
+router.register(r'topup', views.CurrencyViewSet, basename='topup')
+router.register(r'currencies', views.CurrencyViewSet, basename='currencies')
+
+# router.register(r'currencies', views.CurrencyViewSet)
+
 router.register(r'banks', BankViewSet)
 router.register(r'transactions', TransactionViewSet)
 
