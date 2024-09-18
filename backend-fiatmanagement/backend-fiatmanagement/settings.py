@@ -28,7 +28,8 @@ SECRET_KEY = 'django-insecure-gqj&ta5j_u0hy6ck^2&r!yy&-f84cd8)ix@$8nfl7ycwe%3ift
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'fiatmanagement-rcfpsxcera-uc.a.run.app',
+    # 'fiatmanagement-rcfpsxcera-uc.a.run.app',
+    'fiatmanagement-ind-255574993735.asia-south1.run.app'
     
 ]
 # ALLOWED_HOSTS = ['localhost','127.0.0.1']
