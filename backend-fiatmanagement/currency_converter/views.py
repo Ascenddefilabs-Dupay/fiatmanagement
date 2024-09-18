@@ -25,6 +25,7 @@ from django.db import connection
 from rest_framework import viewsets
 from .models import AdminCMS
 from .serializers import AdminCMSSerializer,TopupSerializer
+import uuid
 
 
 
@@ -36,7 +37,35 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class FiatWalletViewSet(viewsets.ModelViewSet):
     queryset = FiatWallet.objects.all()
     serializer_class = FiatWalletSerializer
-    lookup_field="fiat_wallet_id"
+    lookup_field = 'fiat_wallet_id'
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        
+        # Ensure required fields are present
+        if 'fiat_wallet_type' not in data or 'fiat_wallet_currency' not in data or 'user_id' not in data:
+            return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if a wallet with the same user_id already exists
+        user_id = data.get('user_id')
+        existing_wallet = FiatWallet.objects.filter(user_id=user_id).first()
+
+        if existing_wallet:
+            # Use the existing fiat_wallet_id and address if required
+            data['fiat_wallet_id'] = existing_wallet.fiat_wallet_id
+            data['fiat_wallet_address'] = existing_wallet.fiat_wallet_address
+        else:
+            # Generate new fiat_wallet_id and address
+            data['fiat_wallet_id'] = str(uuid.uuid4())[:12]  # Ensure the ID is at most 12 characters long
+            data['fiat_wallet_address'] = "some_generated_address"  # Implement address generation logic
+
+        # Validate and create the wallet
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
