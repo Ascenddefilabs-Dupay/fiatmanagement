@@ -4,12 +4,53 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Bank
 from .serializers import BankSerializer
+from django.db import connection
+import json
 
 @api_view(['POST'])
 def add_bank(request):
-    if request.method == 'POST':
-        serializer = BankSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'Bank added successfully!'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Print request data for debugging
+    print("Received request data:", request.data)
+    print("Received request files:", request.FILES)
+
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'user_id is missing'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Debug print for user_id
+    print("user_id received:", user_id)
+
+    # Fetch user_phone_number from users table using raw SQL
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT user_phone_number FROM users WHERE user_id = %s", [user_id])
+        result = cursor.fetchone()
+    
+    if not result:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    phone_number = result[0]
+
+    # Prepare data to be serialized
+    bank_data = {
+        'user_id': user_id,
+        'phone_number': phone_number,
+        'bank_name': request.data.get('bank_name'),
+        'account_holder_name': request.data.get('account_holder_name'),
+        'account_number': request.data.get('account_number'),
+        'ifsc_code': request.data.get('ifsc_code'),
+        'branch_name': request.data.get('branch_name'),
+        'bic_code': request.data.get('bic_code'),
+        'currency': request.data.get('currency'),
+        'kyc_document': request.FILES.get('kyc_document'),
+    }
+
+    # Debug print for bank_data
+    print("Bank data to be serialized:", bank_data)
+
+    serializer = BankSerializer(data=bank_data)
+    if serializer.is_valid():
+        print("Serializer is valid. Saving data...")
+        serializer.save()
+        return Response({'message': 'Bank added successfully!'}, status=status.HTTP_201_CREATED)
+    print("Serializer errors:", serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

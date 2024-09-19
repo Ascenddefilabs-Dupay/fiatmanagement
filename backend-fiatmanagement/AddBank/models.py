@@ -1,7 +1,14 @@
 # AddBank/models.py
 from django.db import models
+import random
+
+def generate_id():
+    return f'{random.randint(100000, 999999)}'
 
 class Bank(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_id, editable=False)
+    phone_number = models.CharField(max_length=20,null=True)  
+    user_id = models.CharField(max_length=255)
     bank_name = models.CharField(max_length=255)
     account_holder_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=255)  # Using CharField for consistency
@@ -13,5 +20,6 @@ class Bank(models.Model):
 
     def __str__(self):
         return self.bank_name
+
     class Meta:
-        db_table = 'add_bank' 
+        db_table = 'add_bank'
