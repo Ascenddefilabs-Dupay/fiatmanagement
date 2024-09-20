@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'Topup',
     'AddBank',
+    'Fiat_Currency',
     'cloudinary_storage',
     'cloudinary',
 ]
