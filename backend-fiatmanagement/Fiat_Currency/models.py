@@ -42,3 +42,14 @@ class UserCurrency(models.Model):
     class Meta:
         db_table = 'user_currencies'
         managed = False
+
+
+class AdminCMS(models.Model):
+    id = models.PositiveIntegerField(primary_key=True, editable=False)
+    account_type = models.CharField(max_length=100, null=True, blank=True)
+    currency_type = models.CharField(max_length=100, null=True, blank=True)
+    icon = models.CharField(max_length=255, null=True, blank=True)
+    
+    class Meta:
+        db_table = 'admincms'
+        managed = False
