@@ -1,6 +1,7 @@
 # AddBank/models.py
 from django.db import models
 import random
+from cloudinary.models import CloudinaryField
 
 def generate_id():
     return f'{random.randint(100000, 999999)}'
@@ -16,7 +17,7 @@ class Bank(models.Model):
     branch_name = models.CharField(max_length=255)
     bic_code = models.CharField(max_length=11)
     currency = models.CharField(max_length=10)
-    kyc_document = models.ImageField(upload_to='bank_icons/')  # Default file storage
+    kyc_document = CloudinaryField('bankIcon', folder='fiatmanagement', blank=True, null=True)  # Default file storage
 
     def __str__(self):
         return self.bank_name

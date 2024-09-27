@@ -10,7 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api 
+import cloudinary.uploader
+import cloudinary.api
 from pathlib import Path
+
 # import cloudinary
 # import cloudinary.uploader
 # import cloudinary.api
@@ -32,7 +39,7 @@ ALLOWED_HOSTS = [
     'fiatmanagement-ind-255574993735.asia-south1.run.app'
     
 ]
-# ALLOWED_HOSTS = ['localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -114,10 +121,15 @@ DATABASES = {
     }
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dhyuqscdu',
-    'API_KEY': '729466293685987',
-    'API_SECRET': 'GnYO_kYGxabPOJBicGUvCnOGrWc'
+    'CLOUD_NAME': 'dgfv6j82t',
+    'API_KEY': '235116669118225',
+    'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es',
 }
+cloudinary.config(
+    cloud_name='dgfv6j82t',
+    api_key='235116669118225',
+    api_secret='zRMrcJ0xAtw8sI_xV3v3GGx_0es'
+)
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Password validation
