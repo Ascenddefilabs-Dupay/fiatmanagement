@@ -80,3 +80,12 @@ def get_bank_details(request, user_id, bank_name):
         return JsonResponse(bank_data)
     except Bank.DoesNotExist:
         return JsonResponse({'error': 'Bank not found'}, status=404)
+@api_view(['DELETE'])
+def delete_bank_account(request, bank_id):
+    try:
+        # Use raw SQL to delete the bank by ID
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM add_bank WHERE id = %s", [bank_id])
+        return Response({'message': 'Bank account deleted successfully!'}, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
