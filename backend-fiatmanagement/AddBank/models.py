@@ -4,7 +4,7 @@ import random
 from cloudinary.models import CloudinaryField
 
 def generate_id():
-    return f'{random.randint(1000000, 9999999)}'
+    return f'{random.randint(100000, 999999)}'
 
 class Bank(models.Model):
     id = models.CharField(max_length=6, primary_key=True, default=generate_id, editable=False)

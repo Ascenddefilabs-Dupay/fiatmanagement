@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
     'fiatmanagement-ind-255574993735.asia-south1.run.app'
     
 ]
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
+# ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -118,7 +118,7 @@ DATABASES = {
         'sslmode': 'disable'
     }
     }
-#storing images in cloudnary
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dgfv6j82t',
     'API_KEY': '235116669118225',

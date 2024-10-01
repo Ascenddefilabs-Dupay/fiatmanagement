@@ -49,9 +49,9 @@ def add_bank(request):
         'account_number': request.data.get('account_number'),
         'ifsc_code': request.data.get('ifsc_code'),
         'branch_name': request.data.get('branch_name'),
-        'currency': request.data.get('currency'),
-        'bic_code': request.data.get('bic_code'),
         
+        'bic_code': request.data.get('bic_code'),
+        'currency': request.data.get('currency'),
         'kyc_document': request.FILES.get('kyc_document'),
     }
 
