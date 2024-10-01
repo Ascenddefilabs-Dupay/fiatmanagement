@@ -118,7 +118,7 @@ DATABASES = {
         'sslmode': 'disable'
     }
     }
-
+#storing images in cloudnary
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dgfv6j82t',
     'API_KEY': '235116669118225',

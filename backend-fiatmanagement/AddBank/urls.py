@@ -1,10 +1,11 @@
-# AddBank/urls.py
+# A/urls.py
 from django.urls import path
 from . import views
 from .views import add_bank, get_banks_by_user
 
 urlpatterns = [
     path('get_banks/<str:user_id>/', get_banks_by_user, name='get_banks_by_user'),
+    path('add/', views.add_bank, name='add_bank'),
     path('get_bank_details/<str:user_id>/<str:bank_name>/', views.get_bank_details, name='get_bank_details'),
-    path('add/', views.add_bank, name='add_bank'),  # Route for adding a bank
+      # Route for adding a bank
 ]

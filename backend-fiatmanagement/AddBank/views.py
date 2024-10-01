@@ -49,13 +49,14 @@ def add_bank(request):
         'account_number': request.data.get('account_number'),
         'ifsc_code': request.data.get('ifsc_code'),
         'branch_name': request.data.get('branch_name'),
-        'bic_code': request.data.get('bic_code'),
         'currency': request.data.get('currency'),
+        'bic_code': request.data.get('bic_code'),
+        
         'kyc_document': request.FILES.get('kyc_document'),
     }
 
     # Debug print for bank_data
-    print("Bank data to be serialized:", bank_data)
+    print("Bank data to be  serialized:", bank_data)
 
     serializer = BankSerializer(data=bank_data)
     if serializer.is_valid():
