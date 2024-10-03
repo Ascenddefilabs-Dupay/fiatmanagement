@@ -243,7 +243,15 @@ class Transaction(models.Model):
             rows = cursor.fetchall()
         print(rows[-1][7])
         return rows[-1][7]
+class AdminCMS(models.Model):
+    currency_type = models.CharField(max_length=10)  # Example: "INR"
+    icon = models.URLField()  # URL for the icon image
     
+    def __str__(self):
+        return self.currency_type
+    
+    class Meta:
+        db_table = 'admincms'    
 
 
 
