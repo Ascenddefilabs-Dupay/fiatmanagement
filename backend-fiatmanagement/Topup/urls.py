@@ -3,7 +3,9 @@ from rest_framework.routers import DefaultRouter
 
 from Topup import views
 from .views import ProjectViewSet, BankViewSet,UserCurrencyViewSet,TransactionViewSet,AccountTypeList,get_user_registration_stats
-
+from . import views
+from .views import FiatWalletViewSet
+from .views import DefaultCurrencyView
 # Initialize the router
 router = DefaultRouter()
 
@@ -28,4 +30,6 @@ urlpatterns = [
     path('user-registration-stats/', get_user_registration_stats, name='user-registration-stats'),
     path('convert_currency/', views.convert_currency, name='convert_currency'),
     # path('validate_currencies/', views.validate_currencies, name='validateCurrencies'),
+    path('fiat_wallets/<str:wallet_id>/<str:currency_type>/', FiatWalletViewSet.as_view({'get': 'retrieve'}), name='fiat_wallet-detail'),
+    path('admincms/default_currency/', DefaultCurrencyView.as_view(), name='default-currency'),
 ]

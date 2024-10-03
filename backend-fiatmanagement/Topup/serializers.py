@@ -26,14 +26,17 @@ class BankSerializer(serializers.ModelSerializer):
 class AdminCMSSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminCMS
-        fields = ['account_type', 'currency_type'] 
+        fields = ['account_type', 'currency_type','icon'] 
 
 class UsersCurrenciesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserCurrency
         fields = '__all__'
 
-
+    def validate_currency_code(self, value):
+        if len(value) > 15:
+            raise serializers.ValidationError("Currency code is too long.")
+        return value
 
 class FiatWalletSerializer(serializers.ModelSerializer):
     class Meta:
