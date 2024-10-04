@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'Fiat_Currency',
     'cloudinary_storage',
     'cloudinary',
+    'Swap',
 ]
 
 MIDDLEWARE = [

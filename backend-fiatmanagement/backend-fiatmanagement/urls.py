@@ -8,4 +8,5 @@ urlpatterns = [
     path('addbank/', include('AddBank.urls')),  # Include AddBank URLs
     path('Fiat_Currency/', include('Fiat_Currency.urls')),
     path('fiat_withdraw/',include('Withdraw.urls')),
+    path('fiat_fiatSwap/',include('Swap.urls')),
 ]
