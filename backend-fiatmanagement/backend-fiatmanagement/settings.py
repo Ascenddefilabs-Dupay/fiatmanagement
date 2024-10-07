@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
     'fiatmanagement-ind-255574993735.asia-south1.run.app'
     
 ]
-# ALLOWED_HOSTS = ['localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'Fiat_Currency',
     'cloudinary_storage',
     'cloudinary',
+    'Swap',
 ]
 
 MIDDLEWARE = [

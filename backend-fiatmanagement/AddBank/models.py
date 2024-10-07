@@ -2,7 +2,6 @@
 from django.db import models
 import random
 from cloudinary.models import CloudinaryField
-
 def generate_id():
     return f'{random.randint(100000, 999999)}'
 class Bank(models.Model):

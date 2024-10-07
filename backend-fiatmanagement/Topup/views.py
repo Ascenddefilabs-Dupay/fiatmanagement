@@ -33,6 +33,8 @@ from .serializers import AdminCMSSerializer
 from django.db.models import Count # type: ignore
 from django.utils.timezone import now, timedelta # type: ignore
 from django.http import JsonResponse # type: ignore
+from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
 
 
@@ -55,7 +57,8 @@ from .models import UserCurrency
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
+from .serializers import UsersCurrenciesSerializer
+from .models import AdminCMS
 
 
 
@@ -63,7 +66,24 @@ from django.views.decorators.http import require_POST
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    
+# class UserCurrencyBalanceView(APIView):
+#     def get(self, request):
+#         wallet_id = request.query_params.get('wallet_id')
+#         currency_type = request.query_params.get('currency_type')
 
+#         if not wallet_id or not currency_type:
+#             return Response({"error": "wallet_id and currency_type are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             # Fetch the user currency for the specific wallet and currency type
+#             user_currency = UserCurrency.objects.get(wallet__fiat_wallet_id=wallet_id, currency_type=currency_type)
+#             serializer = UsersCurrenciesSerializer(user_currency)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except UserCurrency.DoesNotExist:
+#             return Response({"error": f"User currency for wallet_id {wallet_id} and currency_type {currency_type} not found."}, status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class FiatWalletViewSet(viewsets.ModelViewSet):
     queryset = FiatWallet.objects.all()
     serializer_class = FiatWalletSerializer
@@ -73,29 +93,41 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
         data = request.data
         
         # Ensure required fields are present
-        if 'fiat_wallet_type' not in data or 'fiat_wallet_currency' not in data or 'user_id' not in data:
+        if 'fiat_wallet_type' not in data or 'user_id' not in data:
             return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if a wallet with the same user_id already exists
-        user_id = data.get('user_id')
-        existing_wallet = FiatWallet.objects.filter(user_id=user_id).first()
+        try:
+            # Check if a wallet with the same user_id already exists
+            user_id = data.get('user_id')
+            existing_wallet = FiatWallet.objects.filter(user_id=user_id).first()
 
-        if existing_wallet:
-            # Use the existing fiat_wallet_id and address if required
-            data['fiat_wallet_id'] = existing_wallet.fiat_wallet_id
-            data['fiat_wallet_address'] = existing_wallet.fiat_wallet_address
-        else:
-            # Generate new fiat_wallet_id and address
-            data['fiat_wallet_id'] = str(uuid.uuid4())[:12]  # Ensure the ID is at most 12 characters long
-            data['fiat_wallet_address'] = "some_generated_address"  # Implement address generation logic
+            if existing_wallet:
+                # Use the existing fiat_wallet_id and address if required
+                data['fiat_wallet_id'] = existing_wallet.fiat_wallet_id
+                data['fiat_wallet_address'] = existing_wallet.fiat_wallet_address
+            else:
+                # Generate new fiat_wallet_id and address
+                data['fiat_wallet_id'] = str(uuid.uuid4())[:12]  # Ensure the ID is at most 12 characters long
+                data['fiat_wallet_address'] = "some_generated_address"  # Implement address generation logic
 
-        # Validate and create the wallet
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            # Validate and create the wallet
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+        except ValidationError as e:
+            # Handle Django ValidationError (custom error raised in save)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except DRFValidationError as e:
+            # Handle DRF validation errors
+            return Response({"error": str(e.detail)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # Handle any other unexpected errors
+            return Response({"error": "An unexpected error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -112,10 +144,8 @@ class BankViewSet(viewsets.ModelViewSet):
     queryset = Bank.objects.all()
     serializer_class = BankSerializer
 
-class UsersCurrenciesViewSet(viewsets.ModelViewSet):
-    queryset = UserCurrency.objects.all()
-    serializer_class = UsersCurrenciesSerializer
-    lookup_field="wallet_id"
+# class UserCurrencyViewSet(viewsets.ReadOnlyModelViewSet):
+   
 class UserCurrencyViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], url_path='create_or_update')
     def create_or_update(self, request, *args, **kwargs):
@@ -171,14 +201,18 @@ class UserCurrencyViewSet(viewsets.ViewSet):
                 }, status=status.HTTP_200_OK)
     @action(detail=False, methods=['post'])
     def topup(self, request):
+        
         wallet_id = request.data.get('wallet_id')
         currency_code = request.data.get('currency_code')
         amount = request.data.get('amount')
         transaction_hash = request.data.get('transaction_hash')
 
+        # Validate required fields
         if not wallet_id or not currency_code or amount is None or not transaction_hash:
             return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
 
+        
+        
         try:
             amount = Decimal(amount)
             if amount <= 0:
@@ -188,13 +222,8 @@ class UserCurrencyViewSet(viewsets.ViewSet):
 
         # Get the FiatWallet
         fiat_wallet = get_object_or_404(FiatWallet, fiat_wallet_id=wallet_id)
-
+        
         with transaction.atomic():
-            if fiat_wallet.fiat_wallet_currency == currency_code:
-                # Update fiat_wallet_balance
-                fiat_wallet.fiat_wallet_balance += amount
-                fiat_wallet.save()
-
             # Update UserCurrency balance
             user_currency, created = UserCurrency.objects.get_or_create(
                 wallet_id=wallet_id, 
@@ -202,8 +231,8 @@ class UserCurrencyViewSet(viewsets.ViewSet):
             )
             user_currency.balance += amount
             user_currency.save()
-
-            # Save the transaction
+            
+            # Prepare transaction data
             transaction_data = {
                 "wallet_id": wallet_id,
                 "transaction_amount": amount,
@@ -216,8 +245,12 @@ class UserCurrencyViewSet(viewsets.ViewSet):
                 "transaction_method": "wallet-topup",
             }
 
+            # Save the transaction
+            print(request.data)
             transaction_serializer = TransactionSerializer(data=transaction_data)
             if transaction_serializer.is_valid():
+                
+
                 transaction_serializer.save()
                 return Response({
                     "message": "Top-up successful",
@@ -225,7 +258,6 @@ class UserCurrencyViewSet(viewsets.ViewSet):
                 }, status=status.HTTP_200_OK)
             else:
                 return Response(transaction_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(detail=False, methods=['post'], url_path='withdraw')
     def withdraw(self, request, *args, **kwargs):
         wallet_id = request.data.get('wallet_id')
@@ -413,27 +445,27 @@ def convert_currency(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
+
+class DefaultCurrencyView(APIView):
     
-# @csrf_exempt
-# @require_POST
-# def validate_currencies(request):
-#     try:
-#         data = json.loads(request.body)
-#         wallet_id = data['wallet_id']
-#         source_currency = data['source_currency']
-#         destination_currency = data['destination_currency']
-        
-#         # Check if the source and destination currencies exist
-#         source_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=source_currency).first()
-#         destination_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=destination_currency).first()
+    def get(self, request):
+        # Get the currency_type from the query parameters
+        currency_type = request.query_params.get('currency_type')
 
-#         if not source_currency_obj:
-#             return JsonResponse({'status': 'error', 'message': f'{source_currency} not found for this wallet'}, status=400)
+        if not currency_type:
+            return Response({
+                'error': 'Currency type is required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-#         if not destination_currency_obj:
-#             return JsonResponse({'status': 'error', 'message': f'{destination_currency} not found for this wallet'}, status=400)
-
-#         return JsonResponse({'status': 'success', 'message': 'Currencies exist'})
-
-#     except Exception as e:
-#         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        try:
+            # Fetch the AdminCMS entry for the requested currency
+            admin_cms_entry = AdminCMS.objects.get(currency_type=currency_type)
+            full_icon_url = f"https://res.cloudinary.com/dgfv6j82t/{admin_cms_entry.icon}"
+            return Response({
+                # 'currency_type': admin_cms_entry.currency_type,
+                'icon':  full_icon_url   # This should be the full URL
+            }, status=status.HTTP_200_OK)
+        except AdminCMS.DoesNotExist:
+            return Response({
+                'error': f'Currency type {currency_type} not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
