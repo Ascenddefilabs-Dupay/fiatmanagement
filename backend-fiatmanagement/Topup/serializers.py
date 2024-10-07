@@ -33,10 +33,17 @@ class UsersCurrenciesSerializer(serializers.ModelSerializer):
         model = UserCurrency
         fields = '__all__'
 
+
+
+    
+
     def validate_currency_code(self, value):
         if len(value) > 15:
             raise serializers.ValidationError("Currency code is too long.")
         return value
+
+
+
 
 class FiatWalletSerializer(serializers.ModelSerializer):
     class Meta:

@@ -452,6 +452,7 @@ class DefaultCurrencyView(APIView):
         # Get the currency_type from the query parameters
         currency_type = request.query_params.get('currency_type')
 
+
         if not currency_type:
             return Response({
                 'error': 'Currency type is required.'
@@ -483,13 +484,4 @@ class DefaultCurrencyView(APIView):
 #         source_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=source_currency).first()
 #         destination_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=destination_currency).first()
 
-#         if not source_currency_obj:
-#             return JsonResponse({'status': 'error', 'message': f'{source_currency} not found for this wallet'}, status=400)
 
-#         if not destination_currency_obj:
-#             return JsonResponse({'status': 'error', 'message': f'{destination_currency} not found for this wallet'}, status=400)
-
-#         return JsonResponse({'status': 'success', 'message': 'Currencies exist'})
-
-#     except Exception as e:
-#         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

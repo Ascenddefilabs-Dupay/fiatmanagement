@@ -10,6 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api 
+import cloudinary.uploader
+import cloudinary.api
 from pathlib import Path
     
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,6 +38,7 @@ ALLOWED_HOSTS = [
 ]
 # ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'Topup',
+    'AddBank',
+    'Fiat_Currency',
     'cloudinary_storage',
     'cloudinary',
 ]
@@ -110,10 +119,21 @@ DATABASES = {
     }
 
 CLOUDINARY_STORAGE = {
+<<<<<<< HEAD
     'CLOUD_NAME':'dgfv6j82t',
     'API_KEY': '235116669118225',
     'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es'
+=======
+    'CLOUD_NAME': 'dgfv6j82t',
+    'API_KEY': '235116669118225',
+    'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es',
+>>>>>>> bac414a331015c8e9388cabf5ad60f2403465e2a
 }
+cloudinary.config(
+    cloud_name='dgfv6j82t',
+    api_key='235116669118225',
+    api_secret='zRMrcJ0xAtw8sI_xV3v3GGx_0es'
+)
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Password validation
