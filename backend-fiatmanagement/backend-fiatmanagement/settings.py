@@ -119,15 +119,11 @@ DATABASES = {
     }
 
 CLOUDINARY_STORAGE = {
-<<<<<<< HEAD
+
     'CLOUD_NAME':'dgfv6j82t',
     'API_KEY': '235116669118225',
     'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es'
-=======
-    'CLOUD_NAME': 'dgfv6j82t',
-    'API_KEY': '235116669118225',
-    'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es',
->>>>>>> bac414a331015c8e9388cabf5ad60f2403465e2a
+
 }
 cloudinary.config(
     cloud_name='dgfv6j82t',
