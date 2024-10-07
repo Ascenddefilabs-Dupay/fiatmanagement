@@ -248,6 +248,7 @@ class Transaction(models.Model):
 class AdminCMS(models.Model):
     currency_type = models.CharField(max_length=10)  # Example: "INR"
     icon = models.URLField()  # URL for the icon image
+    account_type=models.CharField(max_length=200)
     
 
 class AdminCMS(models.Model):
