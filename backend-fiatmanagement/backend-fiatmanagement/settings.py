@@ -17,9 +17,7 @@ import cloudinary.api
 import cloudinary.uploader
 import cloudinary.api
 from pathlib import Path
-# import cloudinary
-# import cloudinary.uploader
-# import cloudinary.api
+    
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,7 +32,7 @@ SECRET_KEY = 'django-insecure-gqj&ta5j_u0hy6ck^2&r!yy&-f84cd8)ix@$8nfl7ycwe%3ift
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    # 'fiatmanagement-rcfpsxcera-uc.a.run.app',
+    'fiatmanagement-rcfpsxcera-uc.a.run.app',
     'fiatmanagement-ind-255574993735.asia-south1.run.app'
     
 ]
@@ -121,9 +119,11 @@ DATABASES = {
     }
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dgfv6j82t',
+
+    'CLOUD_NAME':'dgfv6j82t',
     'API_KEY': '235116669118225',
-    'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es',
+    'API_SECRET': 'zRMrcJ0xAtw8sI_xV3v3GGx_0es'
+
 }
 cloudinary.config(
     cloud_name='dgfv6j82t',

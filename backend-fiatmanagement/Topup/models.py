@@ -13,6 +13,7 @@ import base64
 from django.utils import timezone
 import re
 import qrcode
+from django.core.exceptions import ValidationError
 
 
 
@@ -76,10 +77,9 @@ class CustomUser(models.Model):
     # return f"{self.user_first_name} {self.user_last_name}"
 
 class FiatWallet(models.Model):
-    fiat_wallet_id = models.CharField(max_length=12, blank=True)  # ID should be unique if necessary
+    fiat_wallet_id = models.CharField(max_length=15, blank=True)
     fiat_wallet_address = models.CharField(max_length=255, blank=True)
     fiat_wallet_type = models.CharField(max_length=50)
-    fiat_wallet_currency = models.CharField(max_length=10)
     fiat_wallet_balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     fiat_wallet_created_time = models.DateTimeField(auto_now_add=True)
     fiat_wallet_updated_time = models.DateTimeField(auto_now=True)
@@ -92,28 +92,37 @@ class FiatWallet(models.Model):
         blank=True,
         primary_key=True
     )
-    fiat_wallet_email = models.EmailField()
+    fiat_wallet_email = models.EmailField(null=False)
     user_id = models.CharField(max_length=255)
     qr_code = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # Check if the object is being created
-            # Check if the user already has a wallet
+        if not self.pk:  # Check if the object is being created (new object)
             existing_wallet = FiatWallet.objects.filter(user_id=self.user_id).first()
             if existing_wallet:
-                # Use existing wallet data
-                self.fiat_wallet_id = existing_wallet.fiat_wallet_id
-                self.fiat_wallet_address = existing_wallet.fiat_wallet_address
+                raise ValidationError(f"A wallet for user {self.user_id} already exists.")  # Raise error if wallet exists
             else:
-                # Create a new wallet
                 self.fiat_wallet_id = self.generate_wallet_id()
                 self.fiat_wallet_address = self.generate_wallet_address()
         
         self.generate_qr_code()  # Generate QR code for wallet
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)  # Call the superclass's save method
+        self.initialize_user_currencies()  # Initialize user currencies after saving
+
+    def initialize_user_currencies(self):
+    # Get all non-null currency types from AdminCMS
+        currencies = AdminCMS.objects.filter(currency_type__isnull=False).values_list('currency_type', flat=True)
+
+        # Create UserCurrency entries for each currency type
+        for currency in currencies:
+            UserCurrency.objects.get_or_create(
+                wallet_id=self.fiat_wallet_id,  # Use the wallet ID instead of wallet_id field
+                currency_type=currency,
+                defaults={'balance': 0}  # Set initial balance to 0
+            )
+
 
     def generate_wallet_id(self):
-    # Generate a new wallet ID in the format Wa0000000002
         latest_wallet = FiatWallet.objects.order_by('-fiat_wallet_id').first()
         if latest_wallet:
             last_id = latest_wallet.fiat_wallet_id
@@ -127,7 +136,7 @@ class FiatWallet(models.Model):
 
     def generate_wallet_address(self):
         while True:
-            new_address = str(uuid.uuid4())  # Assuming this is the method you use to generate a new address
+            new_address = str(uuid.uuid4())
             if not FiatWallet.objects.filter(fiat_wallet_address=new_address).exists():
                 return new_address
 
@@ -147,16 +156,9 @@ class FiatWallet(models.Model):
         img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
         self.qr_code = img_str
 
-    # def clean(self):
-    #     # Check if the fiat_wallet_id or fiat_wallet_address already exists for the same user
-    #     if FiatWallet.objects.filter(fiat_wallet_id=self.fiat_wallet_id).exclude(pk=self.pk).exists():
-    #         raise ValidationError(f"Fiat wallet with this fiat wallet id already exists.")
-    #     if FiatWallet.objects.filter(fiat_wallet_address=self.fiat_wallet_address).exclude(pk=self.pk).exists():
-    #         raise ValidationError(f"Fiat wallet with this fiat wallet address already exists.")
-    #     super().clean()
-
     class Meta:
         db_table = 'fiat_wallet'
+
 
 class Currency(models.Model):
     currency_code = models.CharField(max_length=10, primary_key=True)
@@ -185,7 +187,7 @@ class Bank(models.Model):
 class UserCurrency(models.Model):
     id = models.AutoField(primary_key=True)
     wallet_id = models.CharField(max_length=255, unique=False)
-    currency_type = models.CharField(max_length=100)
+    currency_type = models.CharField(max_length=30)
     balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
     def __str__(self):
@@ -194,13 +196,13 @@ class UserCurrency(models.Model):
         db_table = 'user_currencies'
     
 class Transaction(models.Model):
-    transaction_id = models.CharField(max_length=100, unique=True, blank=True, editable=False, primary_key=True)
+    transaction_id = models.CharField(max_length=255, unique=True, blank=True, editable=False, primary_key=True)
     transaction_type = models.CharField(max_length=50 ,null=True, blank=True)
     transaction_amount = models.DecimalField(max_digits=18, decimal_places=8 ,null=True, blank=True)
     transaction_currency = models.CharField(max_length=10 ,null=True, blank=True)
     transaction_timestamp = models.DateTimeField(auto_now_add=True)
     transaction_status = models.CharField(max_length=50 ,null=True, blank=True)
-    transaction_hash = models.UUIDField()
+    transaction_hash = models.CharField(max_length=255) 
     transaction_fee = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
     user_phone_number = models.CharField(max_length=15 , null=True, blank=True)
     wallet_id = models.CharField(max_length=100 ,null=True, blank=True)
@@ -248,11 +250,21 @@ class AdminCMS(models.Model):
     icon = models.URLField()  # URL for the icon image
     account_type=models.CharField(max_length=200)
     
+
+class AdminCMS(models.Model):
+    currency_type = models.CharField(max_length=10)  # Example: "INR"
+    icon = models.URLField()  # URL for the icon image
+    account_type=models.CharField(max_length=200)
+    
+    
+
+
     def __str__(self):
         return self.currency_type
     
     class Meta:
-        db_table = 'admincms'    
+
+        db_table = 'admincms'
 
 
 

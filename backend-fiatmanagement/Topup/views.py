@@ -29,7 +29,7 @@ from .models import AdminCMS
 from .serializers import AdminCMSSerializer,TopupSerializer
 import uuid
 
-from .serializers import AdminCMSSerializer
+# from .serializers import AdminCMSSerializer
 from django.db.models import Count # type: ignore
 from django.utils.timezone import now, timedelta # type: ignore
 from django.http import JsonResponse # type: ignore
@@ -452,6 +452,7 @@ class DefaultCurrencyView(APIView):
         # Get the currency_type from the query parameters
         currency_type = request.query_params.get('currency_type')
 
+
         if not currency_type:
             return Response({
                 'error': 'Currency type is required.'
@@ -469,3 +470,18 @@ class DefaultCurrencyView(APIView):
             return Response({
                 'error': f'Currency type {currency_type} not found.'
             }, status=status.HTTP_404_NOT_FOUND)
+
+# @csrf_exempt
+# @require_POST
+# def validate_currencies(request):
+#     try:
+#         data = json.loads(request.body)
+#         wallet_id = data['wallet_id']
+#         source_currency = data['source_currency']
+#         destination_currency = data['destination_currency']
+        
+#         # Check if the source and destination currencies exist
+#         source_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=source_currency).first()
+#         destination_currency_obj = UserCurrency.objects.filter(wallet_id=wallet_id, currency_type=destination_currency).first()
+
+

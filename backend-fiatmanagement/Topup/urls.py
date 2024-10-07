@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from Topup import views
 from .views import ProjectViewSet, BankViewSet,UserCurrencyViewSet,TransactionViewSet,AccountTypeList,get_user_registration_stats
+
 from .views import FiatWalletViewSet
 from .views import DefaultCurrencyView
 # Initialize the router
