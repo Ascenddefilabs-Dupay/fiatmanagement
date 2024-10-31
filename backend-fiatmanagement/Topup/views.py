@@ -132,7 +132,7 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    # lookup_field="id"
+    lookup_field="user_id"
 
     
 
