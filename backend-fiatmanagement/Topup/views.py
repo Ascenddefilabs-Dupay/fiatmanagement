@@ -91,42 +91,41 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        
+
         # Ensure required fields are present
-        if 'fiat_wallet_type' not in data or 'user_id' not in data:
-            return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+        required_fields = ['fiat_wallet_type', 'user_id']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return Response({"error": f"Missing fields: {', '.join(missing_fields)}"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Check if a wallet with the same user_id already exists
-            user_id = data.get('user_id')
+            # Check for existing wallet with the same user_id
+            user_id = data['user_id']
+            custom_user = get_object_or_404(CustomUser, id=user_id)  # Fetch the user instance
+
+            # Add phone number to the wallet data
+            data['phone_number'] = custom_user.phone_number  # Add the user's phone number to data
+
             existing_wallet = FiatWallet.objects.filter(user_id=user_id).first()
 
             if existing_wallet:
-                # Use the existing fiat_wallet_id and address if required
-                data['fiat_wallet_id'] = existing_wallet.fiat_wallet_id
-                data['fiat_wallet_address'] = existing_wallet.fiat_wallet_address
-            else:
-                # Generate new fiat_wallet_id and address
-                data['fiat_wallet_id'] = str(uuid.uuid4())[:12]  # Ensure the ID is at most 12 characters long
-                data['fiat_wallet_address'] = "some_generated_address"  # Implement address generation logic
+                # If wallet exists, reuse fiat_wallet_id and address
+                data.update({
+                    'fiat_wallet_id': existing_wallet.fiat_wallet_id,
+                    'fiat_wallet_address': existing_wallet.fiat_wallet_address,
+                })
 
-            # Validate and create the wallet
+            # Create or update wallet
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-        except ValidationError as e:
-            # Handle Django ValidationError (custom error raised in save)
+        except (ValidationError, DRFValidationError) as e:
+            # Handle validation errors
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except DRFValidationError as e:
-            # Handle DRF validation errors
-            return Response({"error": str(e.detail)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except Exception as e:
-            # Handle any other unexpected errors
+        except Exception:
             return Response({"error": "An unexpected error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserViewSet(viewsets.ModelViewSet):
