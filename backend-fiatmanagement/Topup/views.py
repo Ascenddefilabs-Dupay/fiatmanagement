@@ -132,7 +132,7 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
         print("Request data:", data)  # Debug statement
 
         # Check for required fields
-        required_fields = ['fiat_wallet_type', 'user_id', 'fiat_wallet_email']
+        required_fields = ['user_id', 'fiat_wallet_email']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             return Response({"error": f"Missing fields: {', '.join(missing_fields)}"}, status=status.HTTP_400_BAD_REQUEST)
@@ -170,7 +170,7 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
             wallet_data = {
                 "fiat_wallet_id": fiat_wallet_id,
                 "fiat_wallet_address": fiat_wallet_address,
-                "fiat_wallet_type": data['fiat_wallet_type'],
+                # "fiat_wallet_type": data['fiat_wallet_type'],
                 "fiat_wallet_balance": data.get('fiat_wallet_balance', 0),
                 "fiat_wallet_email": data['fiat_wallet_email'],
                 "fiat_wallet_phone_number": fiat_wallet_phone_number,
@@ -185,6 +185,24 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             print("Serialized data:", serializer.validated_data)  # Debug statement
             self.perform_create(serializer)
+
+            # Fetch all currency types from AdminCMS
+            currency_types = AdminCMS.objects.exclude(currency_type__isnull=True).values_list('currency_type', flat=True)
+            user_currency_data = []
+            
+            # Create a UserCurrency entry for each currency type
+            for currency_type in currency_types:
+                user_currency_data.append({
+                    "wallet_id": fiat_wallet_id,
+                    "currency_type": currency_type,
+                    "balance": 0.0  # Set initial balance to 0
+                })
+
+            # Bulk create UserCurrency entries
+            UserCurrency.objects.bulk_create([
+                UserCurrency(**data) for data in user_currency_data
+            ])
+
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 

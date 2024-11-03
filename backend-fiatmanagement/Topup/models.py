@@ -79,7 +79,7 @@ class CustomUser(models.Model):
 class FiatWallet(models.Model):
     fiat_wallet_id = models.CharField(max_length=255, primary_key=True, blank=True)  # Set as primary key
     fiat_wallet_address = models.CharField(max_length=255, blank=True)
-    fiat_wallet_type = models.CharField(max_length=50)
+    # fiat_wallet_type = models.CharField(max_length=50)
     fiat_wallet_balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     fiat_wallet_created_time = models.DateTimeField(auto_now_add=True)
     fiat_wallet_updated_time = models.DateTimeField(auto_now=True)
