@@ -59,8 +59,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .serializers import UsersCurrenciesSerializer
 from .models import AdminCMS
+import logging
 
-
+import uuid
+import base64
+import qrcode
+from io import BytesIO
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -84,6 +88,40 @@ class ProjectViewSet(viewsets.ModelViewSet):
 #             return Response({"error": f"User currency for wallet_id {wallet_id} and currency_type {currency_type} not found."}, status=status.HTTP_404_NOT_FOUND)
 #         except Exception as e:
 #             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def generate_wallet_id():
+    latest_wallet = FiatWallet.objects.order_by('-fiat_wallet_id').first()
+    if latest_wallet:
+        last_id = latest_wallet.fiat_wallet_id
+        if last_id.startswith('Wa'):
+            number = int(last_id[2:])  # Extract the number part
+        else:
+            number = 0
+        new_number = number + 1
+        return f'Wa{new_number:010d}'  # Ensure ID is 12 characters long
+    return 'Wa0000000001'  # Starting ID
+
+def generate_wallet_address():
+    while True:
+        new_address = str(uuid.uuid4())
+        if not FiatWallet.objects.filter(fiat_wallet_address=new_address).exists():
+            return new_address
+
+def generate_qr_code(email, phone_number):
+    qr_data = f"{email}-{phone_number}"
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, "PNG")
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
 class FiatWalletViewSet(viewsets.ModelViewSet):
     queryset = FiatWallet.objects.all()
     serializer_class = FiatWalletSerializer
@@ -91,42 +129,69 @@ class FiatWalletViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        print("Request data:", data)  # Debug statement
 
-        # Ensure required fields are present
-        required_fields = ['fiat_wallet_type', 'user_id']
+        # Check for required fields
+        required_fields = ['fiat_wallet_type', 'user_id', 'fiat_wallet_email']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             return Response({"error": f"Missing fields: {', '.join(missing_fields)}"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Check for existing wallet with the same user_id
+            # Retrieve the user by user_id
             user_id = data['user_id']
-            custom_user = get_object_or_404(CustomUser, id=user_id)  # Fetch the user instance
+            try:
+                user = CustomUser.objects.get(user_id=user_id)  # Fetch the user record
+                phone_number = user.user_phone_number  # Get phone number from user record
+            except CustomUser.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Add phone number to the wallet data
-            data['phone_number'] = custom_user.phone_number  # Add the user's phone number to data
+            # Use phone number from request data if provided, otherwise use the one from the user record
+            fiat_wallet_phone_number = data.get('fiat_wallet_phone_number') or phone_number
+            if not fiat_wallet_phone_number:
+                return Response({"error": "Phone number is required and was not found."}, status=status.HTTP_400_BAD_REQUEST)
 
+            # Check for an existing wallet with the same user_id
             existing_wallet = FiatWallet.objects.filter(user_id=user_id).first()
-
             if existing_wallet:
-                # If wallet exists, reuse fiat_wallet_id and address
-                data.update({
-                    'fiat_wallet_id': existing_wallet.fiat_wallet_id,
-                    'fiat_wallet_address': existing_wallet.fiat_wallet_address,
-                })
+                # If a wallet already exists, reuse fiat_wallet_id and fiat_wallet_address
+                return Response({
+                    "message": "Wallet already exists for this user.",
+                    "fiat_wallet_id": existing_wallet.fiat_wallet_id,
+                    "fiat_wallet_address": existing_wallet.fiat_wallet_address
+                }, status=status.HTTP_200_OK)
 
-            # Create or update wallet
-            serializer = self.get_serializer(data=data)
+            # Generate wallet ID, address, and QR code if this is a new wallet
+            fiat_wallet_id = generate_wallet_id()
+            fiat_wallet_address = generate_wallet_address()
+            qr_code = generate_qr_code(data['fiat_wallet_email'], fiat_wallet_phone_number)
+
+            # Prepare the payload for saving the wallet
+            wallet_data = {
+                "fiat_wallet_id": fiat_wallet_id,
+                "fiat_wallet_address": fiat_wallet_address,
+                "fiat_wallet_type": data['fiat_wallet_type'],
+                "fiat_wallet_balance": data.get('fiat_wallet_balance', 0),
+                "fiat_wallet_email": data['fiat_wallet_email'],
+                "fiat_wallet_phone_number": fiat_wallet_phone_number,
+                "user_id": user_id,
+                "qr_code": qr_code,
+            }
+
+            print("Wallet data to be serialized:", wallet_data)  # Debug statement
+
+            # Serialize and save the wallet
+            serializer = self.get_serializer(data=wallet_data)
             serializer.is_valid(raise_exception=True)
+            print("Serialized data:", serializer.validated_data)  # Debug statement
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
         except (ValidationError, DRFValidationError) as e:
-            # Handle validation errors
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response({"error": "An unexpected error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({"error": "An unexpected error occurred: " + str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()

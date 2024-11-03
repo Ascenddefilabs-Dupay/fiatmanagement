@@ -77,7 +77,7 @@ class CustomUser(models.Model):
     # return f"{self.user_first_name} {self.user_last_name}"
 
 class FiatWallet(models.Model):
-    fiat_wallet_id = models.CharField(max_length=15, blank=True)
+    fiat_wallet_id = models.CharField(max_length=255, primary_key=True, blank=True)  # Set as primary key
     fiat_wallet_address = models.CharField(max_length=255, blank=True)
     fiat_wallet_type = models.CharField(max_length=50)
     fiat_wallet_balance = models.DecimalField(max_digits=18, decimal_places=8, default=0)
@@ -89,75 +89,16 @@ class FiatWallet(models.Model):
             regex=r'^\+?1?\d{9,15}$',
             message="Invalid phone number format."
         )],
-        blank=True,
-        primary_key=True
+        blank=True
     )
     fiat_wallet_email = models.EmailField(null=False)
     user_id = models.CharField(max_length=255)
     qr_code = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:  # Check if the object is being created (new object)
-            existing_wallet = FiatWallet.objects.filter(user_id=self.user_id).first()
-            if existing_wallet:
-                raise ValidationError(f"A wallet for user {self.user_id} already exists.")  # Raise error if wallet exists
-            else:
-                self.fiat_wallet_id = self.generate_wallet_id()
-                self.fiat_wallet_address = self.generate_wallet_address()
-        
-        self.generate_qr_code()  # Generate QR code for wallet
-        super().save(*args, **kwargs)  # Call the superclass's save method
-        self.initialize_user_currencies()  # Initialize user currencies after saving
-
-    def initialize_user_currencies(self):
-    # Get all non-null currency types from AdminCMS
-        currencies = AdminCMS.objects.filter(currency_type__isnull=False).values_list('currency_type', flat=True)
-
-        # Create UserCurrency entries for each currency type
-        for currency in currencies:
-            UserCurrency.objects.get_or_create(
-                wallet_id=self.fiat_wallet_id,  # Use the wallet ID instead of wallet_id field
-                currency_type=currency,
-                defaults={'balance': 0}  # Set initial balance to 0
-            )
-
-
-    def generate_wallet_id(self):
-        latest_wallet = FiatWallet.objects.order_by('-fiat_wallet_id').first()
-        if latest_wallet:
-            last_id = latest_wallet.fiat_wallet_id
-            if last_id.startswith('Wa'):
-                number = int(last_id[2:])  # Extract the number part
-            else:
-                number = 0
-            new_number = number + 1
-            return f'Wa{new_number:010d}'  # Ensure ID is 12 characters long
-        return 'Wa0000000001'  # Starting ID
-
-    def generate_wallet_address(self):
-        while True:
-            new_address = str(uuid.uuid4())
-            if not FiatWallet.objects.filter(fiat_wallet_address=new_address).exists():
-                return new_address
-
-    def generate_qr_code(self):
-        qr_data = f"{self.fiat_wallet_email}-{self.fiat_wallet_phone_number}"
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-        buffer = BytesIO()
-        img.save(buffer, "PNG")
-        img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
-        self.qr_code = img_str
-
     class Meta:
         db_table = 'fiat_wallet'
+
+
 
 
 class Currency(models.Model):
