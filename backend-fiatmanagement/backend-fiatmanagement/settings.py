@@ -108,7 +108,7 @@ WSGI_APPLICATION = 'backend-fiatmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_cockroachdb',
-        'NAME': 'dupay',
+        'NAME': env('DB_NAME'),
         'USER': 'dupay',
         'PASSWORD': 'lPVRIuSyVCJqfmghd7ckBw',
         'HOST': 'chill-dibbler-5989.7s5.aws-ap-south-1.cockroachlabs.cloud',
