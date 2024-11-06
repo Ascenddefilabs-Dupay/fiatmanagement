@@ -17,9 +17,13 @@ import cloudinary.api
 import cloudinary.uploader
 import cloudinary.api
 from pathlib import Path
+import environ
     
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env() 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,12 +35,7 @@ SECRET_KEY = 'django-insecure-gqj&ta5j_u0hy6ck^2&r!yy&-f84cd8)ix@$8nfl7ycwe%3ift
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'fiatmanagement-rcfpsxcera-uc.a.run.app',
-    'fiatmanagement-ind-255574993735.asia-south1.run.app'
-    
-]
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -71,6 +70,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://dupay.biz",
 ]
 CORS_ALLOW_METHODS = [
     'GET',
